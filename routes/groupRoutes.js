@@ -3,6 +3,6 @@ const express = require("express");
 const router = express.Router();
 const {handleCreateGroup, handleAddMember}= require("../controllers/groupControllers");
 //I need to name the endpoints on user perspective or developer perspective
-router.post("/create",handleCreateGroup);
+router.post("/createGroup",handleCreateGroup);
 router.post("/addMember",handleAddMember)
 module.exports = router;

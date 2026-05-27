@@ -3,6 +3,7 @@ const express = require("express");
 const pool = require("./config/database.js");
 const userRouter = require("./routes/userRoutes.js");
 const groupRouter = require("./routes/groupRoutes.js");
+const expenseRouter = require("./routes/ExpenseRoutes.js")
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.get("/db-test", async (req, res) => {
 //attach user routes to a base path
 app.use("/api/users", userRouter);
 app.use("/api/groups", groupRouter);
+app.use("/api/expenses",expenseRouter)
 
 // 4. Port Configuration (Professional Defaulting)
 const PORT = process.env.PORT || 5000;
