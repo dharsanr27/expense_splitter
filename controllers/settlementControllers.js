@@ -7,7 +7,7 @@ try{
     const {groupId,fromUserId,toUserId,amount}=req.body;
     if(!groupId || !fromUserId || !toUserId || !amount)
     {
-        res.status(401).json(
+       return res.status(401).json(
             {
                 success:false,
                 message:"All fields are required"
@@ -15,7 +15,7 @@ try{
         )
     }
     const newSettlement = await createSettlement(groupId,fromUserId,toUserId,amount);
-    res.status(201).json(
+     return  res.status(201).json(
         {
             success:true,
             message:"Settlement succesfully added",
@@ -27,7 +27,7 @@ try{
 catch(error)
 {
     console.error("Error in handleCreateSettlement controller:",error);
-    res.status(500).json(
+    return res.status(500).json(
         {
             success:false,
             message:"Something went wrong on server"

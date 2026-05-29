@@ -6,7 +6,7 @@ async function handleCreateGroup(req,res)
 const {groupName,createdBy}= req.body;
 if(!groupName || !createdBy)
 {
-    res.status(400).json(
+  return  res.status(400).json(
         {
             success:false,
             message:"All fields are required"
@@ -44,7 +44,7 @@ const {groupId,userId} = req.body;
 if(!groupId || !userId)
 {
     //data validation status code 400
-    res.status(400).json(
+   return res.status(400).json(
         {
             success:false,
             message:"All fields are required"
@@ -54,7 +54,7 @@ if(!groupId || !userId)
 }
 const newMember = await addMemberToGroup(groupId,userId);
 //status code:201 for successful post data the database
-res.status(201).json(
+return res.status(201).json(
     {
         success:true,
         //modify this so that it should show group name in which the user joined task 1: pending
@@ -67,7 +67,7 @@ res.status(201).json(
 catch(error)
 {
     console.error("Error in add member to the group controller:",error);
-    res.status(500).json(
+   return res.status(500).json(
         {
             success:false,
             message:"Something went wrong in server"
