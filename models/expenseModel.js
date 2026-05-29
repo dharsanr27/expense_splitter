@@ -64,13 +64,17 @@ async function getUserGroupBalance(groupId,userId)
        const balanceSql =`
        select (select username from users where id=$2) as username, (select name from groups where id=$1) as group_name,
        coalesce((select sum(amount) from expenses where group_id=$1 and paid_by=$2),0) as total_paid,
+       coalesce((select sum(amount) from settlements where from_user_id=$2 and group_id=$1),0) as settlements_send,
+       coalesce((select sum(amount) from settlements where to_user_id=$2 and group_id=$1),0) as settlements_recieved,
        coalesce((select sum(amount_owed) from splits where user_id=$2 and expense_id in (select id from expenses where group_id=$1)),0) as total_owed;`;
        const balanceResult = await pool.query(balanceSql,[groupId,userId]);
-       const totalPaid = balanceResult.rows[0].total_paid;
-       const totalOwed =balanceResult.rows[0].total_owed;
-       const groupName =balanceResult.rows[0].group_name;
-       const username = balanceResult.rows[0].username;
-       const netBalance = totalPaid - totalOwed;
+       const totalPaid = parseFloat(balanceResult.rows[0].total_paid);
+       const totalOwed =parseFloat(balanceResult.rows[0].total_owed);
+       const settlementsSent = parseFloat(balanceResult.rows[0].settlements_send);
+       const settlementsRecieved = parseFloat(balanceResult.rows[0].settlements_recieved);
+       const groupName =balanceResult.rows[0].group_name || "Unknown Group";
+       const username = balanceResult.rows[0].username || "Unknown User";
+       const netBalance = (totalPaid+settlementsSent) - (totalOwed+settlementsRecieved);
        return{
         GroupId:groupId,
         GroupName:groupName,
