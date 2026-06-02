@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
 const { createUser, getUserByEmail } = require("../models/userModels.js");
 //1.Registering user
 async function handleRegisterUser(req, res) {
@@ -52,13 +53,23 @@ async function handleLoginUser(req, res) {
     const  isMatch = await bcrypt.compare(password,user.password);
     if(!isMatch)
     {
-      res.status(401).json(
+      res.status(400).json(
         {
           success:false,
           message:"Invalid credentials"
         }
       );
     }
+    //JWT Generation happens
+    const token = jwt.sign(
+      {
+        userId:user.id
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn:'24h'
+      }
+    );
    return res.status(200).json(
       {
         success: true,
