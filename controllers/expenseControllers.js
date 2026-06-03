@@ -1,4 +1,5 @@
 const { createExpenseWithSplits, getUserGroupBalance, getUsersExpensesWithSplits } = require("../models/expenseModel.js");
+const { sanitizeInput } = require("../utils/sanitize.js");
 
 
 async function handleExpenseWithSplitCreation(req,res) {
@@ -11,8 +12,11 @@ async function handleExpenseWithSplitCreation(req,res) {
                 success:false,
                 message:"All fields are required"
             });
+
         }
-        const newExpense = await createExpenseWithSplits(groupId,paidBy,totalAmount,description);
+        //sanitize the description input
+        const cleanDescription = sanitizeInput(description);
+        const newExpense = await createExpenseWithSplits(groupId,paidBy,totalAmount,cleanDescription);
         res.status(201).json(
             {
                 success:true,

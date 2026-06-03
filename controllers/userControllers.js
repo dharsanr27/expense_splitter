@@ -12,9 +12,9 @@ async function handleRegisterUser(req, res) {
         message: "All fields are required",
       });
     }
-    //if password present how will you handle it for safety
+    
     //talk to the model to create the user
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);//what is the number 10 denotes
     const newUser = await createUser(username, email, hashedPassword);
     return res.status(201).json({
       success: true,
@@ -53,7 +53,7 @@ async function handleLoginUser(req, res) {
     const  isMatch = await bcrypt.compare(password,user.password);
     if(!isMatch)
     {
-      res.status(400).json(
+     return res.status(400).json(
         {
           success:false,
           message:"Invalid credentials"
@@ -74,11 +74,13 @@ async function handleLoginUser(req, res) {
       {
         success: true,
         message:"login succesful!",
+         token:token,
         data:
         {
           id:user.id,
           username:user.username,
           email:user.email
+         
         }
       }
     );

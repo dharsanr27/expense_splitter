@@ -5,7 +5,7 @@ async function createUser(username, email, password) {
   try {
     const sql = `INSERT INTO users(username,email,password)
     values($1,$2,$3)
-    returning *;
+    returning id,username,email,created_at;
     `;
     //how to implement invalid email or wrong email
     const result = await pool.query(sql, [username, email, password]);
