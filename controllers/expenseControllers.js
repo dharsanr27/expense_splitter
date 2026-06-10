@@ -1,19 +1,10 @@
 const { createExpenseWithSplits, getUserGroupBalance, getUsersExpensesWithSplits } = require("../models/expenseModel.js");
 const { sanitizeInput } = require("../utils/sanitize.js");
 
-
-async function handleExpenseWithSplitCreation(req,res) {
+async function handleExpenseWithSplitCreation(req,res,next) {
     try{
         const {groupId,paidBy,totalAmount,description}=req.body;
-        if(!groupId || !paidBy || !totalAmount || !description)
-        {
-            res.status(400).json
-            ({
-                success:false,
-                message:"All fields are required"
-            });
-
-        }
+       
         //sanitize the description input
         const cleanDescription = sanitizeInput(description);
         const newExpense = await createExpenseWithSplits(groupId,paidBy,totalAmount,cleanDescription);
@@ -30,30 +21,20 @@ async function handleExpenseWithSplitCreation(req,res) {
     catch(error)
     {
         console.error("error in handleExpenseSplitCreation controller: ",error);
-        res.status(500).json(
-            {
-                success:false,
-                message:"Something went wrong in server"
-            }
-        )
+        //how it know that it should go to central error
+       next(error);
+       //if the error is shown in central error how can we know which compound is making error
     }
     
 }
-async function  handleUserBalance(req,res)
+async function  handleUserBalance(req,res,next)
 {
     try{
 const {groupId,userId}=req.body;
-if(!groupId || !userId)
-{
-    res.status(400).json(
-        {
-            success:false,
-            message:"All fields are needed"
-        }
-    );
-}
+
     const newUserBalance = await getUserGroupBalance(groupId,userId);
-    res.status(201).json(
+    console.log("🚀 Inside the controller, executing database transaction...");
+   return res.status(201).json(
         {
             success:true,
             message:"Net balance is successfully calculated",
@@ -64,31 +45,17 @@ if(!groupId || !userId)
     }
     catch(error)
     {
-        console.error("Error in getUserGroupBalance controller:",error);
-        res.status(500).json(
-            {
-                success:false,
-                message:"Something went wrong in server"
-            }
-        )
+      next(error);
 
     }
 
 }
-async function handleGetUsersExpensesWithSplits(req,res)
+async function handleGetUsersExpensesWithSplits(req,res,next)
 {
     //for get request get don't have a body
     try{
          const {groupId} = req.params;
-    if(!groupId)
-    {
-        res.status(401).json(
-            {
-                success:false,
-                message:"All fields are required"
-            }
-        )
-    }
+    
     const newGroupExpensesWithSplit = await getUsersExpensesWithSplits(parseInt(groupId));//why we are parseInt(groupId)
     if(!newGroupExpensesWithSplit ||newGroupExpensesWithSplit.length ==0){//why !newGroupExpensesWithSplit
         return res.status(200).json(
@@ -128,13 +95,7 @@ async function handleGetUsersExpensesWithSplits(req,res)
     }
     catch(error)
     {
-      console.error("Error in handleGetUsersExpensesWithSplits controller:",error)
-      res.status(500).json(
-        {
-            success:false,
-            message:"Something went wrong on Server"
-        }
-      )
+      next(error);
     }
    
 }

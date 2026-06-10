@@ -5,12 +5,18 @@ const userRouter = require("./routes/userRoutes.js");
 const groupRouter = require("./routes/groupRoutes.js");
 const expenseRouter = require("./routes/expenseRoutes.js");
 const settlementRouter = require("./routes/settlementRoutes.js");
+const cors =require('cors');
+const   rateLimit 
+
+= require("./middlewares/rateLimitMiddleware.js");
 
 const app = express();
+app.use(cors());
 
 // 2. Middleware (The "Security & Parsing" layer)
 
 app.use(express.json());
+app.use(rateLimit)
 
 // 3. The "Health Check" Route
 app.get("/ping", (req, res) => {
