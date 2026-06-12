@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": false,            // 👈 CRITICAL: Keeps things loose so old JS code doesn't error out
+    "allowJs": true,            // 👈 CRITICAL: Allows JS and TS files to live together
+    "checkJs": false,           // 👈 Don't type-check old JS files yet
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"]
+}
