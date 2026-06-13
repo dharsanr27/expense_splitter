@@ -23,11 +23,12 @@ export interface Expense {
     amount: number;
     created_at?: Date;
 }
-
+export type SplitStatus = 'pending' | 'paid' | 'cancelled';
 // 4. The "Split" Entity (How much each person owes)
 export interface Split {
     id: number;
     expense_id: number;
     user_id: number;
     amount_owed: number;
+    status:SplitStatus;
 }

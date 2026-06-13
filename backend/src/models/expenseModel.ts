@@ -14,6 +14,7 @@ export async function createExpenseWithSplits(
   totalAmount: number;
   splitAmount: number;
   totalMembers: number;
+  status:string;
 }>{
   //why we are using the pool.connect
   //what is transaction concept
@@ -32,6 +33,7 @@ export async function createExpenseWithSplits(
       paidBy,
       totalAmount,
       description,
+    
     ]);
     const expenseId = expenseResult.rows[0].id;
     //2.fetch all members of the group
@@ -46,10 +48,14 @@ export async function createExpenseWithSplits(
     const splitAmount = totalAmount / totalMembers;
     //automatically loop and insert into splits
     for (const member of members) {
+      if(member ==paidBy)
+      {
+        continue;
+      }
       const splitSql = `
-            insert into splits(expense_id,user_id,amount_owed)
-            values($1,$2,$3);`;
-      await client.query(splitSql, [expenseId, member.user_id, splitAmount]);
+            insert into splits(expense_id,user_id,amount_owed,status)
+            values($1,$2,$3,$4);`;
+      await client.query(splitSql, [expenseId, member.user_id, splitAmount,'pending']);
     }
 
     await client.query("COMMIT"); //Save everything if no errors occured
@@ -60,6 +66,8 @@ export async function createExpenseWithSplits(
       totalAmount: totalAmount,
       splitAmount: splitAmount,
       totalMembers: totalMembers,
+      status:'pending',
+      
     };
   } catch (error) {
     await client.query("ROLLBACK"); //erase everything from this attempt
