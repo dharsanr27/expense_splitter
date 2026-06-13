@@ -1,1 +1,4 @@
-".errolog"
+node_modules/
+.env
+.errorlog
+useful_command
