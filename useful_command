@@ -1,0 +1,12 @@
+/*Used to know the column names in the tabels
+SELECT table_name, column_name 
+FROM information_schema.columns 
+WHERE table_name IN ('expenses', 'splits')
+ORDER BY table_name; */
+
+
+
+/*
+USEFUL FOR GENERATING RANDOM STRING
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+*/

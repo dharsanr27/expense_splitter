@@ -37,3 +37,33 @@ export async function addMemberToGroup(groupId:number,userId:number):Promise<any
         throw error;
     }
 }
+
+export async function memberList(groupId:number):Promise<any>
+{
+    try{
+        const sql = `select username from users as u
+        join group_members as gm on u.id=gm.user_id
+        where group_id=$1;`;
+        const result= await pool.query(sql,[groupId]);
+        return result.rows;
+    }
+    catch(error)
+    {
+        console.error("Error in memberList model:",error)
+    }
+}
+export async function userGroups(userId:number):Promise<any>
+{
+    try{
+         const sql=`select id,name from groups
+         join group_members on groups.id=group_members.group_id
+        where user_id=$1;`;
+        const result =await pool.query(sql,[userId]);
+        return result.rows;
+    }
+    catch(error)
+    {
+        console.error("Error in userGroups model:",error);
+    }
+  
+}

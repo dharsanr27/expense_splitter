@@ -26,6 +26,8 @@ export function auth(req:AuthenticatedRequest,res:Response,next:NextFunction):vo
     try{
         const decode =jwt.verify(token,process.env.JWT_SECRET);
         req.user =decode;//what it will store
+        console.log("decoded JWT PAYLOAD IS:",decode);
+        console.log()
         next();//why we need next how it know next where to go
     }
     catch(error)

@@ -1,10 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { useNavigate } from "react-router-dom";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import API from "../api/axios";
 import { useState } from "react";
 
 function Login() {
+  const navigate = useNavigate();
   const[email,setEmail]=useState("");
   // const[username,setUserName]=useState("");
  
@@ -24,6 +26,7 @@ function Login() {
             password
             });
           console.log(response.data); 
+          navigate('/');
         }
         catch(error)
         {

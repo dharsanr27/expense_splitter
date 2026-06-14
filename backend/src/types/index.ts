@@ -1,3 +1,5 @@
+import { JwtPayload } from 'jsonwebtoken';
+
 export interface User{
     id:number;
     username:string;
@@ -31,4 +33,10 @@ export interface Split {
     user_id: number;
     amount_owed: number;
     status:SplitStatus;
+}
+
+export interface UserPayload extends JwtPayload {
+    userId: number;
+    // email: string;
+    // role: 'admin' | 'user';
 }

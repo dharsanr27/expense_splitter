@@ -9,7 +9,11 @@
     "allowJs": true,            // 👈 CRITICAL: Allows JS and TS files to live together
     "checkJs": false,           // 👈 Don't type-check old JS files yet
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots": ["./node_modules/@types","./src/types"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "ts-node": {
+    "files": true
+  }
 }

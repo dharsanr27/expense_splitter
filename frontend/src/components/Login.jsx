@@ -1,11 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { useNavigate } from "react-router-dom";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import {useState} from 'react';
+
 import API from "../api/axios";
 
 function Login() {
-
+const navigate = useNavigate();
     const [email,setEmail]=useState("");
     const [password,setPassword]=useState("");
     const handleEmail = ((event)=>{setEmail(event.target.value)});
@@ -31,6 +33,7 @@ function Login() {
     });
     localStorage.setItem("token",response.data.token);
      console.log(response.data);
+     navigate('/dashboard')
  }catch(error)
  {
     console.error(error);
@@ -55,6 +58,8 @@ function Login() {
                 Don't have an account?<a href="/signup" className="hover:underline">Sign Up</a>
             </p>
           </form>
+       
+         
         </CardContent>
       </Card>
     </div>
