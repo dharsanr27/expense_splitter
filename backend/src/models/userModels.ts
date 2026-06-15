@@ -33,4 +33,19 @@ export async function getUserByEmail(email:string):Promise<User | null> {
     throw error;
   }
 }
+export async function getUserByName(userName:string):Promise<User | null> {
+  try {
+    const sql = `
+    SELECT id,username  FROM users
+    WHERE username ILike $1
+    LIMIT 10;
+    
+    `;
+    const result = await pool.query<User>(sql, [`%${userName}%`]);
+    return result.rows;
+  } catch (error) {
+    console.error("Error in getUserByEmail model:", error);
+    throw error;
+  }
+}
 

@@ -44,7 +44,8 @@ if(!groupName || !createdBy)
 export async function handleAddMember(req:Request,res:Response):Promise<any>
 {
     try{
-const {groupId,userId} = req.body;
+        const {groupId} = req.params;
+const {userId} = req.body;
 //data validation
 if(!groupId || !userId)
 {
@@ -57,7 +58,7 @@ if(!groupId || !userId)
     )
 
 }
-const newMember = await addMemberToGroup(groupId,userId);
+const newMember = await addMemberToGroup(parseInt(groupId as string),userId);//why we are doing the parseint for everytime we use params
 //status code:201 for successful post data the database
 return res.status(201).json(
     {

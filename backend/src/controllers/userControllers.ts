@@ -1,7 +1,7 @@
 import  bcrypt from "bcrypt";
 import  jwt from "jsonwebtoken";
 import { Request,Response } from "express";
-import { createUser, getUserByEmail } from "../models/userModels";
+import { createUser, getUserByEmail, getUserByName } from "../models/userModels";
 //1.Registering user
 export async function handleRegisterUser(req:Request, res:Response):Promise<any> {
   try {
@@ -86,3 +86,36 @@ export async function handleLoginUser(req:Request, res:Response):Promise<any> {
   }
 }
 
+export async function handleGetUser(req:Request, res:Response):Promise<any>
+{
+  try{
+const {search} =req.query;
+    if(typeof search !== 'string')
+    {
+      return res.json([]);
+    }
+    if(!search || search.trim()==='')
+    {
+      return res.json([]);
+    }
+    const newGetUser = await getUserByName(search);
+    return res.status(201).json(
+    {
+        success:true,
+        //modify this so that it should show group name in which the user joined task 1: pending
+        message:"Succesfully retrieved username:",
+        data: newGetUser
+    }
+);
+  }
+  catch(error)
+  {
+     console.error("Error in get user controller", error);
+    //why we don't need throw here
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong on server",
+    });
+  }
+  }
+    
