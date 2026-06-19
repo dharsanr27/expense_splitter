@@ -19,9 +19,6 @@ export async function createSettlement(groupId:number,fromUserId:number,toUserId
         values($1,$2,$3,$4)
         returning * ;`;
         const settlementResult = await client.query(settlementSql,[groupId,fromUserId,toUserId,amount]);
-        const updateStatusSql=`
-        UPDATE splits SET status='paid' WHERE user_id=$1 and expense_id=$2 and status='pending'; ` ;
-        const updateStatusResult= await client.query(updateStatusSql,[fromUserId,expenseId]);
         await client.query("COMMIT");
         return settlementResult.rows[0];
         

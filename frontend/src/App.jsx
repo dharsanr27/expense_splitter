@@ -5,10 +5,11 @@ import CreateGroup from "./components/CreateGroup";
 import GroupDetailPage from "./components/GroupDetailPage";
 import GroupMembersList from "./components/GroupMembersList";
 import Dashboard from "./components/Dashboard";
-
 function App() {
   return (
+    
     <BrowserRouter>
+    
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -18,6 +19,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard/>}/>
       </Routes>
     </BrowserRouter>
+    
   );
 }
 

@@ -12,15 +12,13 @@ export const expenseSplitSchema = z.object(
 );
 export const UserBalanceSchema = z.object(
     {
-        groupId:z.number().int().positive(),
-        userId:z.number().int().positive()
-    }
-);
-
-export const groupExpenseWithSplitSchema = z.object(
+    params:z.object(
     {
-        groupId:z.coerce.number().int().positive()
-    }
-);
+        groupId:z.coerce.number().int().positive(),
+        
+    })
+});
+
+
 
 //what is the diff btw module.eports and esc modules

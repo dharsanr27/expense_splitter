@@ -14,7 +14,6 @@ export async function createExpenseWithSplits(
   totalAmount: number;
   splitAmount: number;
   totalMembers: number;
-  status:string;
 }>{
   //why we are using the pool.connect
   //what is transaction concept
@@ -33,7 +32,6 @@ export async function createExpenseWithSplits(
       paidBy,
       totalAmount,
       description,
-    
     ]);
     const expenseId = expenseResult.rows[0].id;
     //2.fetch all members of the group
@@ -48,14 +46,11 @@ export async function createExpenseWithSplits(
     const splitAmount = totalAmount / totalMembers;
     //automatically loop and insert into splits
     for (const member of members) {
-      if(member ==paidBy)
-      {
-        continue;
-      }
+
       const splitSql = `
-            insert into splits(expense_id,user_id,amount_owed,status)
-            values($1,$2,$3,$4);`;
-      await client.query(splitSql, [expenseId, member.user_id, splitAmount,'pending']);
+            insert into splits(expense_id,user_id,amount_owed)
+            values($1,$2,$3);`;
+      await client.query(splitSql, [expenseId, member.user_id, splitAmount]);
     }
 
     await client.query("COMMIT"); //Save everything if no errors occured
@@ -66,7 +61,7 @@ export async function createExpenseWithSplits(
       totalAmount: totalAmount,
       splitAmount: splitAmount,
       totalMembers: totalMembers,
-      status:'pending',
+     
       
     };
   } catch (error) {
@@ -77,84 +72,87 @@ export async function createExpenseWithSplits(
   }
 }
 //2.Check user balance
-export async function getUserGroupBalance(groupId:number, userId:number):Promise<{
+export async function getUserGroupBalance(groupId:number):Promise<{
   GroupId: number;
   GroupName: string;
+  UserId:number;
   UserName: string;
   TotalAmountPaid: number;
   TotalAmountOwed: number;
   NetBalanceAmount: number;
-}> {
+}[]> {
   //Task 3: try to modify this two querry into one querry
   try {
     //TO find the total amount paid by the user in a specific group
     const balanceSql = `
-       select (select username from users where id=$2) as username, (select name from groups where id=$1) as group_name,
-       coalesce((select sum(amount) from expenses where group_id=$1 and paid_by=$2),0) as total_paid,
-       coalesce((select sum(amount) from settlements where from_user_id=$2 and group_id=$1),0) as settlements_send,
-       coalesce((select sum(amount) from settlements where to_user_id=$2 and group_id=$1),0) as settlements_recieved,
-       coalesce((select sum(amount_owed) from splits where user_id=$2 and expense_id in (select id from expenses where group_id=$1)),0) as total_owed;`;
-    const balanceResult = await pool.query(balanceSql, [groupId, userId]);
-    const totalPaid = parseFloat(balanceResult.rows[0].total_paid);
-    const totalOwed = parseFloat(balanceResult.rows[0].total_owed);
-    const settlementsSent = parseFloat(balanceResult.rows[0].settlements_send);
-    const settlementsRecieved = parseFloat(
-      balanceResult.rows[0].settlements_recieved,
-    );
-    const groupName = balanceResult.rows[0].group_name || "Unknown Group";
-    const username = balanceResult.rows[0].username || "Unknown User";
-    const netBalance =
-      totalPaid + settlementsSent - (totalOwed + settlementsRecieved);
-    return {
-      GroupId: groupId,
-      GroupName: groupName,
-      UserName: username,
-      TotalAmountPaid: totalPaid,
-      TotalAmountOwed: totalOwed,
-      NetBalanceAmount: netBalance,
-    };
+       WITH GroupPaid AS (
+          SELECT paid_by AS user_id, SUM(amount) AS total_paid
+          FROM expenses 
+          WHERE group_id = $1
+          GROUP BY paid_by
+      ),
+      GroupOwed AS (
+          SELECT s.user_id, SUM(s.amount_owed) AS total_owed
+          FROM splits s 
+          JOIN expenses e ON s.expense_id = e.id
+          WHERE e.group_id = $1
+          GROUP BY s.user_id
+      ),
+      GroupSettlementsSent AS (
+          SELECT from_user_id AS user_id, SUM(amount) AS settlements_sent
+          FROM settlements 
+          WHERE group_id = $1
+          GROUP BY from_user_id
+      ),
+      GroupSettlementsReceived AS (
+          SELECT to_user_id AS user_id, SUM(amount) AS settlements_received
+          FROM settlements 
+          WHERE group_id = $1
+          GROUP BY to_user_id
+      )
+      
+      SELECT 
+          u.id AS user_id,
+          u.username,
+          g.name AS group_name,
+          COALESCE(p.total_paid, 0) AS total_paid,
+          COALESCE(o.total_owed, 0) AS total_owed,
+          COALESCE(ss.settlements_sent, 0) AS settlements_sent,
+          COALESCE(sr.settlements_received, 0) AS settlements_received
+      FROM group_members gm
+      JOIN users u ON gm.user_id = u.id
+      JOIN groups g ON gm.group_id = g.id
+      LEFT JOIN GroupPaid p ON u.id = p.user_id
+      LEFT JOIN GroupOwed o ON u.id = o.user_id
+      LEFT JOIN GroupSettlementsSent ss ON u.id = ss.user_id
+      LEFT JOIN GroupSettlementsReceived sr ON u.id = sr.user_id
+      WHERE gm.group_id = $1;`;
+    const balanceResult = await pool.query(balanceSql, [groupId]);
+   const allBalances = balanceResult.rows.map(row => {
+      const totalPaid = parseFloat(row.total_paid);
+      const totalOwed = parseFloat(row.total_owed);
+      const settlementsSent = parseFloat(row.settlements_sent);
+      const settlementsReceived = parseFloat(row.settlements_received);
+      
+      const groupName = row.group_name || "Unknown Group";
+      const username = row.username || "Unknown User";
+      
+      // The Core Accounting Math
+      const netBalance = totalPaid + settlementsSent - (totalOwed + settlementsReceived);
+
+      return {
+        GroupId: groupId,
+        GroupName: groupName,
+        UserId: parseInt(row.user_id),
+        UserName: username,
+        TotalAmountPaid: totalPaid,
+        TotalAmountOwed: totalOwed,
+        NetBalanceAmount: netBalance,
+      };
+    });
+    return allBalances
   } catch (error) {
     console.error("Error in getUserGroupBalance model:", error);
-    throw error;
-  }
-}
-//SHOW ALL USERS EXPENSE AND SPLITS IN A GROUP
-export interface GroupExpenseSummary
-{
-  group_name: string;
-  username: string;
-  user_id: number;
-  total_expense_paid: number | string; // Postgres SUM returns a string/numeric
-  total_splits_owed: number | string;
-}
-export async function getUsersExpensesWithSplits(groupId:number):Promise<GroupExpenseSummary[]> {
-  try {
-    //can i write is exact query by using form users
-    const sql = `select
-    g.name as group_name,
-    u.username,
-    u.id as user_id,
-    coalesce(e.total_paid,0) as total_expense_paid,
-    coalesce(s.total_owed,0) as total_splits_owed
-    from group_members gm
-    join groups g on gm.group_id = g.id
-    join users u on gm.user_id = u.id
-    --Subquery to calculate total expense of the user
-    left join(select paid_by,sum(amount) as total_paid
-    from expenses
-    where group_id =$1
-    group by paid_by) e on u.id = e.paid_by
-    --Subquery to calculate total owed by the user
-    left join(select splits.user_id,sum(splits.amount_owed) as total_owed from splits 
-    join expenses ex on splits.expense_id = ex.id
-    where group_id =$1
-    group by splits.user_id) s on u.id = s.user_id
-    where gm.group_id =$1;
-  `;
-    const result = await pool.query<GroupExpenseSummary>(sql, [groupId]);
-    return result.rows;
-  } catch (error) {
-    console.error("Error in getUserExpensesWithSplits model:", error);
     throw error;
   }
 }

@@ -32,6 +32,9 @@ const navigate = useNavigate();
         password
     });
     localStorage.setItem("token",response.data.token);
+    localStorage.setItem("userId", String(response.data.data.id));
+    localStorage.setItem("userName", response.data.data.username);
+
      console.log(response.data);
      navigate('/dashboard')
  }catch(error)

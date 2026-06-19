@@ -41,7 +41,7 @@ export async function addMemberToGroup(groupId:number,userId:number):Promise<any
 export async function memberList(groupId:number):Promise<any>
 {
     try{
-        const sql = `select username from users as u
+        const sql = `select id,username from users as u
         join group_members as gm on u.id=gm.user_id
         where group_id=$1;`;
         const result= await pool.query(sql,[groupId]);

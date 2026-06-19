@@ -6,6 +6,7 @@ import userRouter from "./routes/userRoutes";
 import groupRouter from "./routes/groupRoutes";
 import expenseRouter from "./routes/expenseRoutes";
 import settlementRouter from "./routes/settlementRoutes";
+import dashboardRouter from "./routes/dashboardRoutes"
 import cors from "cors";
 import rateLimit from "./middlewares/rateLimitMiddleware";
 
@@ -49,6 +50,7 @@ app.use("/api/users", userRouter);
 app.use("/api/groups", groupRouter);
 app.use("/api/expenses", expenseRouter);
 app.use("/api/settlements", settlementRouter);
+app.use("/api/dashboardData",dashboardRouter)
 
 // 4. Port Configuration (Professional Defaulting)
 const PORT = process.env.PORT || 5000;

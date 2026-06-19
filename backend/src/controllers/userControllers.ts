@@ -66,6 +66,7 @@ export async function handleLoginUser(req:Request, res:Response):Promise<any> {
         expiresIn: "24h",
       },
     );
+    console.log(token);
     return res.status(200).json({
       success: true,
       message: "login succesful!",

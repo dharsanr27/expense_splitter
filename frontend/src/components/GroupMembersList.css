@@ -1,0 +1,660 @@
+/*
+  Group Members — "Ledger" design system
+  ---------------------------------------
+  A shared-expense page should feel like a passbook: warm paper, ink-stamped
+  status marks, tabular numerals for money, and a torn-receipt perforation
+  between sections. Light and dark themes are driven entirely by CSS
+  variables scoped to [data-theme], so the toggle never touches React state
+  beyond which value it writes.
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap");
+
+.gm-app {
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+
+  /* Light theme (default) */
+  --bg: #f2f4f1;
+  --surface: #ffffff;
+  --surface-alt: #ebefea;
+  --border: #d9ded7;
+  --ink: #182019;
+  --ink-soft: #5c6a61;
+  --ink-faint: #8b978f;
+  --accent: #0f6b5c;
+  --accent-strong: #0b5448;
+  --accent-soft: #e2efe9;
+  --accent-on: #ffffff;
+  --debt: #ae4230;
+  --debt-soft: #f5e5e0;
+  --shadow-card:
+    0 1px 2px rgba(24, 32, 25, 0.04), 0 10px 24px rgba(24, 32, 25, 0.05);
+  --shadow-sheet: 0 -8px 30px rgba(24, 32, 25, 0.18);
+  --overlay: rgba(15, 20, 17, 0.5);
+
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+.gm-app[data-theme="dark"] {
+  --bg: #11161a;
+  --surface: #1a2127;
+  --surface-alt: #212a31;
+  --border: #2d383f;
+  --ink: #ecf0ee;
+  --ink-soft: #9faca5;
+  --ink-faint: #6c7a73;
+  --accent: #3fbe9f;
+  --accent-strong: #59d4b5;
+  --accent-soft: #16332c;
+  --accent-on: #07241e;
+  --debt: #e2876c;
+  --debt-soft: #3a241d;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 24px rgba(0, 0, 0, 0.35);
+  --shadow-sheet: 0 -10px 36px rgba(0, 0, 0, 0.5);
+  --overlay: rgba(0, 0, 0, 0.65);
+}
+
+.gm-app * {
+  box-sizing: border-box;
+}
+
+.gm-shell {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 28px 18px 64px;
+}
+
+@media (min-width: 860px) {
+  .gm-shell {
+    max-width: 920px;
+  }
+}
+
+/* Members list docked beside its quick actions, single column on mobile */
+.gm-row {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 860px) {
+  .gm-row {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .gm-col-members {
+    flex: 1.15;
+    margin: 0;
+  }
+
+  .gm-col-actions {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  /* Cards already sit in their own column, so no horizontal rule needed */
+  .gm-tear--stack-only {
+    display: none;
+  }
+}
+
+/* ---------- Header ---------- */
+
+.gm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.gm-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 4px;
+}
+
+.gm-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--ink);
+}
+
+.gm-count {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--ink-faint);
+}
+
+.gm-theme-toggle {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    transform 0.1s ease,
+    background 0.15s ease;
+}
+
+.gm-theme-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.gm-theme-toggle:active {
+  transform: scale(0.92);
+}
+
+.gm-theme-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ---------- Alerts ---------- */
+
+.gm-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 14px;
+  border: 1px solid transparent;
+}
+
+.gm-alert--error {
+  background: var(--debt-soft);
+  color: var(--debt);
+  border-color: var(--debt);
+}
+
+.gm-alert--success {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ---------- Cards ---------- */
+
+.gm-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 4px;
+}
+
+.gm-card-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 14px;
+  color: var(--ink);
+}
+
+/* Perforated "tear" divider — the page's one signature flourish,
+   evoking a torn receipt between ledger sections. */
+.gm-tear {
+  height: 1px;
+  margin: 22px 4px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--border) 0,
+    var(--border) 7px,
+    transparent 7px,
+    transparent 15px
+  );
+}
+
+/* ---------- Members list ---------- */
+
+.gm-member-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.gm-member-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.gm-avatar {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+}
+
+.gm-member-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.gm-member-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gm-you-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  background: var(--surface-alt);
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
+/* "Stamp" chip — the recurring motif for every money status in the page */
+.gm-chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  transform: rotate(0deg);
+}
+
+.gm-chip--positive {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.gm-chip--negative {
+  color: var(--debt);
+  background: var(--debt-soft);
+}
+
+.gm-chip--neutral {
+  color: var(--ink-faint);
+  background: var(--surface-alt);
+}
+
+.gm-empty {
+  color: var(--ink-faint);
+  font-size: 14px;
+  padding: 6px 0;
+}
+
+/* ---------- Settle up ---------- */
+
+.gm-subhead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  margin: 18px 0 8px;
+}
+
+.gm-subhead:first-child {
+  margin-top: 0;
+}
+
+.gm-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gm-dot--debt {
+  background: var(--debt);
+}
+.gm-dot--credit {
+  background: var(--accent);
+}
+.gm-dot--neutral {
+  background: var(--ink-faint);
+}
+
+.gm-debt-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gm-debt-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface-alt);
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.gm-debt-amount {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.gm-record-btn {
+  flex-shrink: 0;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  background: transparent;
+  border: 1.5px solid var(--accent);
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.gm-record-btn:hover {
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+.gm-record-btn:active {
+  transform: scale(0.96);
+}
+
+/* ---------- Forms ---------- */
+
+.gm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gm-field {
+  position: relative;
+}
+
+.gm-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.gm-input {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--surface-alt);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.gm-input::placeholder {
+  color: var(--ink-faint);
+}
+
+.gm-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+.gm-input--amount {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.gm-dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 6px);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.gm-dropdown-item {
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.gm-dropdown-item:hover,
+.gm-dropdown-item:focus-visible {
+  background: var(--accent-soft);
+}
+
+.gm-btn {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition:
+    transform 0.1s ease,
+    opacity 0.15s ease,
+    background 0.15s ease;
+}
+
+.gm-btn:active {
+  transform: scale(0.98);
+}
+
+.gm-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.gm-btn-primary {
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+.gm-btn-primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+
+.gm-btn-secondary {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--ink);
+}
+
+.gm-btn-secondary:hover {
+  border-color: var(--ink-faint);
+}
+
+.gm-btn--block {
+  width: 100%;
+}
+
+/* ---------- Settle-up sheet (thumb-friendly) ---------- */
+
+.gm-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  z-index: 100;
+}
+
+.gm-sheet {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  padding: 14px 22px calc(22px + env(safe-area-inset-bottom, 0px));
+  box-shadow: var(--shadow-sheet);
+  animation: gm-sheet-up 0.22s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gm-sheet {
+    animation: none;
+  }
+}
+
+@keyframes gm-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.gm-sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+  margin: 0 auto 18px;
+}
+
+.gm-sheet-title {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+
+.gm-sheet-body {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 0 0 22px;
+}
+
+.gm-sheet-body strong {
+  font-family: var(--font-mono);
+  color: var(--ink);
+}
+
+.gm-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Generous, thumb-sized hit targets for the confirm / cancel pair */
+.gm-sheet-actions .gm-btn {
+  min-height: 54px;
+  font-size: 16px;
+  border-radius: 14px;
+}
+
+@media (min-width: 640px) {
+  .gm-sheet-overlay {
+    align-items: center;
+    padding: 24px;
+  }
+
+  .gm-sheet {
+    border-radius: 20px;
+  }
+}
+
+/* ---------- Focus visibility ---------- */
+
+.gm-app a:focus-visible,
+.gm-app button:focus-visible,
+.gm-app input:focus-visible,
+.gm-app li:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 380px) {
+  .gm-shell {
+    padding: 22px 14px 56px;
+  }
+
+  .gm-title {
+    font-size: 21px;
+  }
+}
