@@ -67,7 +67,7 @@ return res.status(201).json(
         message:"Succesfully added  to the group",
         data: newMember
     }
-);
+);``
     }
 
 catch(error)

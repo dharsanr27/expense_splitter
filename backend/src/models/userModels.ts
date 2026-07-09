@@ -3,15 +3,13 @@ import {User} from "../types/index";
 //1. creating a user
 export async function createUser(
   username:string,
-   email:string,
-    password:string):Promise<User> {
-  //how should we avoid sql injection
+  email:string,
+  password:string):Promise<User> {
+ 
   try {
     const sql = `INSERT INTO users(username,email,password)
     VALUES($1,$2,$3)
-    RETURNING id,username,email,created_at;
-    `;
-    //how to implement invalid email or wrong email
+    RETURNING id,username,email,created_at;`;
     const result = await pool.query<User>(sql, [username, email, password]);
     return result.rows[0];
   } catch (error) {
@@ -33,15 +31,15 @@ export async function getUserByEmail(email:string):Promise<User | null> {
     throw error;
   }
 }
-export async function getUserByName(userName:string):Promise<User | null> {
+export async function getUserByName(userName:string):Promise<User[] | null> {
   try {
     const sql = `
-    SELECT id,username  FROM users
+    SELECT id,username,email  FROM users
     WHERE username ILike $1
     LIMIT 10;
     
     `;
-    const result = await pool.query<User>(sql, [`%${userName}%`]);
+    const result = await pool.query<User[]>(sql, [`%${userName}%`]);
     return result.rows;
   } catch (error) {
     console.error("Error in getUserByEmail model:", error);

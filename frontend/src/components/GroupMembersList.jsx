@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import debounce from "lodash.debounce";
 import API from "@/api/axios";
 import "./GroupMembersList.css";
+import { useTheme } from "./ThemeContext";
 
 // Purely presentational helpers — generate a stable initial + colour per
 // username so each member gets a consistent avatar across renders.
@@ -25,31 +26,7 @@ const getAvatarColor = (name = "") => {
   return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
 };
 
-const SunIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-  >
-    <circle cx="12" cy="12" r="4.5" />
-    <path d="M12 2.5v2.5M12 19v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12H5M19 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8" />
-  </svg>
-);
 
-const MoonIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z" />
-  </svg>
-);
 
 const GroupMembersList = () => {
   const { groupId } = useParams();
@@ -79,24 +56,7 @@ const GroupMembersList = () => {
 
   // Theme is purely presentational state — defaults to the system
   // preference, then remembers whatever the person picks.
-  const [theme, setTheme] = useState(() => {
-    const saved =
-      typeof window !== "undefined" ? localStorage.getItem("gm-theme") : null;
-    if (saved === "light" || saved === "dark") return saved;
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-color-scheme: dark)").matches
-    ) {
-      return "dark";
-    }
-    return "light";
-  });
-
-  useEffect(() => {
-    localStorage.setItem("gm-theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+  const{theme}=useTheme();
 
   // --- API CALLS ---
   const fetchGroupData = useCallback(async () => {
@@ -306,7 +266,7 @@ const GroupMembersList = () => {
   // --- RENDER ---
   if (loading) {
     return (
-      <div className="gm-app" data-theme={theme}>
+      <div className="gm-app">
         <div className="gm-shell">
           <p style={{ textAlign: "center", color: "var(--ink-soft)" }}>
             Loading members...
@@ -326,19 +286,7 @@ const GroupMembersList = () => {
               Group Members <span className="gm-count">({members.length})</span>
             </h1>
           </div>
-          <button
-            type="button"
-            className="gm-theme-toggle"
-            onClick={toggleTheme}
-            aria-label={
-              theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
-            }
-            title={
-              theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
-            }
-          >
-            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
-          </button>
+          
         </header>
 
         {error && (

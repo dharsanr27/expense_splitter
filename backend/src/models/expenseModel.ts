@@ -1,5 +1,6 @@
 import pool from "../config/database";
 import { Expense } from "../types/index";
+import { ExpenseCreation,GroupBalance } from "../types/expense.types";
 //Task 2: don't forget to add a function to avoid duplicates in expense table
 //1.create Expense with splits
 export async function createExpenseWithSplits(

@@ -11,29 +11,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap");
 
 .gm-app {
-  --font-display: "Sora", system-ui, sans-serif;
-  --font-body: "IBM Plex Sans", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
-
-  /* Light theme (default) */
-  --bg: #f2f4f1;
-  --surface: #ffffff;
-  --surface-alt: #ebefea;
-  --border: #d9ded7;
-  --ink: #182019;
-  --ink-soft: #5c6a61;
-  --ink-faint: #8b978f;
-  --accent: #0f6b5c;
-  --accent-strong: #0b5448;
-  --accent-soft: #e2efe9;
-  --accent-on: #ffffff;
-  --debt: #ae4230;
-  --debt-soft: #f5e5e0;
-  --shadow-card:
-    0 1px 2px rgba(24, 32, 25, 0.04), 0 10px 24px rgba(24, 32, 25, 0.05);
-  --shadow-sheet: 0 -8px 30px rgba(24, 32, 25, 0.18);
-  --overlay: rgba(15, 20, 17, 0.5);
-
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-body);
@@ -41,24 +18,6 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.gm-app[data-theme="dark"] {
-  --bg: #11161a;
-  --surface: #1a2127;
-  --surface-alt: #212a31;
-  --border: #2d383f;
-  --ink: #ecf0ee;
-  --ink-soft: #9faca5;
-  --ink-faint: #6c7a73;
-  --accent: #3fbe9f;
-  --accent-strong: #59d4b5;
-  --accent-soft: #16332c;
-  --accent-on: #07241e;
-  --debt: #e2876c;
-  --debt-soft: #3a241d;
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 24px rgba(0, 0, 0, 0.35);
-  --shadow-sheet: 0 -10px 36px rgba(0, 0, 0, 0.5);
-  --overlay: rgba(0, 0, 0, 0.65);
-}
 
 .gm-app * {
   box-sizing: border-box;

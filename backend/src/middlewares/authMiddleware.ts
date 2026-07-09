@@ -22,7 +22,7 @@ export function auth(req:AuthenticatedRequest,res:Response,next:NextFunction):vo
         }
        )
     }
-    const token = authHeader.split(' ')[1];//what is the purpose of this line
+    const token = authHeader.split(' ')[1];
     try{
         const decode =jwt.verify(token,process.env.JWT_SECRET);
         req.user =decode;//what it will store

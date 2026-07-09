@@ -2,59 +2,74 @@ import  bcrypt from "bcrypt";
 import  jwt from "jsonwebtoken";
 import { Request,Response } from "express";
 import { createUser, getUserByEmail, getUserByName } from "../models/userModels";
+import { User } from "../types/index";
 //1.Registering user
-export async function handleRegisterUser(req:Request, res:Response):Promise<any> {
+interface RegisterRequestBody{
+  username:string;
+  email:string;
+  password:string
+}
+interface BaseResponse<T>{ 
+  success:boolean;
+  message:string;
+  data?:T
+}
+export async function handleRegisterUser(req:Request<{},BaseResponse<User>,RegisterRequestBody,{}>, res:Response<BaseResponse<User>>):Promise<void> {
   try {
-    //destructing
     const { username, email, password } = req.body;
     if (!username || !email || !password) {
       res.status(400).json({
         success: false,
         message: "All fields are required",
       });
+      return
     }
-
-    //talk to the model to create the user
-    const hashedPassword = await bcrypt.hash(password, 10); //what is the number 10 denotes
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await createUser(username, email, hashedPassword);
-    return res.status(201).json({
+     res.status(201).json({
       success: true,
       message: "user registered succesfully",
       data: newUser,
     });
   } catch (error) {
     console.error("erro in user register controller:", error);
-    return res.status(500).json({
+     res.status(500).json({
       success: false,
       message: "something went wrong on the server",
     });
   }
 }
 //2.Login controller
-export async function handleLoginUser(req:Request, res:Response):Promise<any> {
+interface LoginResponseBody<T,> extends BaseResponse<T>{
+  
+  token?:string;
+}
+type LoginRequestBody = Omit<RegisterRequestBody,"name">
+
+export async function handleLoginUser(req:Request<{},LoginResponseBody<User>,LoginRequestBody,{}>, res:Response<LoginResponseBody<User>>):Promise<void> {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res
+       res
         .status(400)
         .json({ success: false, message: "Email and password required" });
+        return;
     }
-    //why we are adding the () for getUserByEmail ,does it not affect the code
     const user = await getUserByEmail(email);
     if (!user) {
-      //what the diff btw 400 and 401
-      return res.status(401).json({
+       res.status(401).json({
         success: false,
         message: "Invalid credentials",
       });
+      return;
     }
-    //how it gives the password of the user using user.pasword
-    const isMatch = await bcrypt.compare(password, user.password);//try to test it
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({
+       res.status(401).json({
         success: false,
         message: "Invalid credentials",
       });
+      return;
     }
     //JWT Generation happens
     const token = jwt.sign(
@@ -67,7 +82,7 @@ export async function handleLoginUser(req:Request, res:Response):Promise<any> {
       },
     );
     console.log(token);
-    return res.status(200).json({
+     res.status(200).json({
       success: true,
       message: "login succesful!",
       token: token,
@@ -79,31 +94,35 @@ export async function handleLoginUser(req:Request, res:Response):Promise<any> {
     });
   } catch (error) {
     console.error("Error in login controller", error);
-    //why we don't need throw here
-    return res.status(500).json({
+     res.status(500).json({
       success: false,
-      message: "Something went wrong on server",
-    });
+      message:"Something went wrong on server",
+    }); 
   }
 }
+//3.get user by name
+interface GetUserQuery{
+  search?:string;
+}
 
-export async function handleGetUser(req:Request, res:Response):Promise<any>
+export async function handleGetUser(req:Request<{},BaseResponse<User[]>,{},GetUserQuery>, res:Response<BaseResponse<User[]>>):Promise<void>
 {
   try{
 const {search} =req.query;
     if(typeof search !== 'string')
-    {
-      return res.json([]);
+     {
+      res.json({ success: true, message: "No search term", data: [] });
+      return;
     }
     if(!search || search.trim()==='')
     {
-      return res.json([]);
+      res.json({ success: true, message: "No search term", data: [] });
+      return;
     }
     const newGetUser = await getUserByName(search);
-    return res.status(201).json(
+     res.status(201).json(
     {
         success:true,
-        //modify this so that it should show group name in which the user joined task 1: pending
         message:"Succesfully retrieved username:",
         data: newGetUser
     }
@@ -112,8 +131,7 @@ const {search} =req.query;
   catch(error)
   {
      console.error("Error in get user controller", error);
-    //why we don't need throw here
-    return res.status(500).json({
+     res.status(500).json({
       success: false,
       message: "Something went wrong on server",
     });

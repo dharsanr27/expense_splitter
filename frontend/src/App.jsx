@@ -5,11 +5,13 @@ import CreateGroup from "./components/CreateGroup";
 import GroupDetailPage from "./components/GroupDetailPage";
 import GroupMembersList from "./components/GroupMembersList";
 import Dashboard from "./components/Dashboard";
+import { ThemeProvider } from "./components/ThemeContext";
+import Navbar from "./components/navbar";
 function App() {
   return (
-    
+    <ThemeProvider>
     <BrowserRouter>
-    
+    <Navbar/>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -19,6 +21,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard/>}/>
       </Routes>
     </BrowserRouter>
+    </ThemeProvider>
     
   );
 }

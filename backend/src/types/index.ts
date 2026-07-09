@@ -4,10 +4,8 @@ export interface User{
     id:number;
     username:string;
     email:string;
-    created_at:Date;
+    created_at?:Date;
     password?:string;
-    //why we are not mentioning password here
-
 }
 
 export interface Group{
@@ -15,6 +13,12 @@ export interface Group{
    name: string;
    created_by: number;
    created_at?: Date;
+}
+
+export interface GroupMember{
+    group_id:number ;
+    user_id:number ;
+    joined_at?:Date ;
 }
 // 3. The Expense Entity
 export interface Expense {

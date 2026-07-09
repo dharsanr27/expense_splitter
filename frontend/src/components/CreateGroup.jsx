@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import API from '../api/axios'; // Import your custom client
+import { useTheme } from "./ThemeContext";
 
 const CreateGroup = () => {
   const [groupName, setGroupName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const { theme } = useTheme();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,17 +28,18 @@ const CreateGroup = () => {
       setIsLoading(false);
     }
   };
-
+const isDark = theme === "dark";
   return (
-    <div className="flex min-h-[50vh] items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-8 shadow-xl border border-gray-100">
+   <div className={isDark ? "dark" : ""}>
+    <div className="flex min-h-screen items-center justify-center bg-[#F2F4F1] dark:bg-[#11161A] text-[#2a2318] dark:text-[#ECF0EE] px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8 rounded-2xl bg-[#FFFFFF] dark:bg-[#1A2127] p-8 shadow-xl border border-gray-100">
         
         {/* Header */}
         <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+          <h2 className="text-3xl font-bold tracking-tight">
             Create a New Group
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-[#8B978F] dark:text-[#6C7A73]">
             Collaborate and share with your team members.
           </p>
         </div>
@@ -44,7 +47,7 @@ const CreateGroup = () => {
         {/* Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <label htmlFor="group-name" className="text-sm font-medium text-gray-700 block">
+            <label htmlFor="group-name" className="text-sm font-medium text-[#2a2318] dark:text-[#ECF0EE] block">
               Group Name
             </label>
             <input
@@ -55,14 +58,15 @@ const CreateGroup = () => {
               placeholder="e.g., Marketing Team, Project Alpha"
               required
               disabled={isLoading}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 bg-[#EBEFEA] dark:bg-[#212A31] text-[#2a2318] dark:text-[#ECF0EE] placeholder-gray-400 
                          transition duration-200 ease-in-out
-                         focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20
+                         focus: [#0F6B5C] dark:[#3FBE9F]  focus:outline-none focus:ring-2 focus: ring-[#0F6B5C] dark:ring-[#3FBE9F]
                          disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
             />
           </div>
 
           {/* Feedback Messages */}
+          
           {message.text && (
             <div
               className={`rounded-lg p-3 text-sm font-medium ${
@@ -79,11 +83,11 @@ const CreateGroup = () => {
           <button
             type="submit"
             disabled={isLoading || !groupName.trim()}
-            className="group relative flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-3 
+            className="group relative flex w-full justify-center rounded-lg bg-[#0F6B5C] px-4 py-3 
                        text-sm font-semibold text-white transition duration-200 ease-in-out 
-                       hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 
+                       hover:bg-[#0c5449] focus-visible:outline focus-visible:outline-2 
                        focus-visible:outline-offset-2 focus-visible:outline-indigo-600 
-                       disabled:cursor-not-allowed disabled:bg-indigo-400"
+                       disabled:cursor-not-allowed "
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
@@ -102,6 +106,8 @@ const CreateGroup = () => {
 
       </div>
     </div>
+   </div>
+    
   );
 };
 
