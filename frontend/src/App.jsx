@@ -6,7 +6,7 @@ import GroupDetailPage from "./components/GroupDetailPage";
 import GroupMembersList from "./components/GroupMembersList";
 import Dashboard from "./components/Dashboard";
 import { ThemeProvider } from "./components/ThemeContext";
-import Navbar from "./components/navbar";
+import Navbar from "./components/Navbar";
 function App() {
   return (
     <ThemeProvider>
