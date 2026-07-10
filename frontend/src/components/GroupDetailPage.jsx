@@ -68,7 +68,7 @@ const GroupsListPage = () => {
             </div>
             <Link
               to="/createGroup"
-              className="shrink-0 whitespace-nowrap rounded-xl bg-[#0F6B5C] hover:bg-[#0c5449] active:scale-[0.98] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition"
+              className="shrink-0 whitespace-nowrap rounded-xl bg-[#0F6B5C] hover:bg-[#0c5449] active:scale-[0.98] px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition"
             >
               + New Group
             </Link>
@@ -110,7 +110,7 @@ const GroupsListPage = () => {
                 <Link
                   key={group.id}
                   to={`/groups/${group.id}`}
-                  className="group relative rounded-2xl border border-[#D9DED7] dark:border-[#2D383F] bg-[#FFFFFF] dark:bg-[#1A2127] p-5 shadow-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:border-[#0F6B5C] hover:shadow-md"
+                  className="group relative rounded-2xl border border-[#D9DED7] dark:border-[#2D383F] bg-[#FFFFFF] dark:bg-[#1A2127] p-5 shadow-xs transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:border-[#0F6B5C] hover:shadow-md"
                 >
                   <div className="flex items-center justify-between gap-3">
 

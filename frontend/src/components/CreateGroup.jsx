@@ -60,7 +60,7 @@ const isDark = theme === "dark";
               disabled={isLoading}
               className="w-full rounded-lg border border-gray-300 px-4 py-3 bg-[#EBEFEA] dark:bg-[#212A31] text-[#2a2318] dark:text-[#ECF0EE] placeholder-gray-400 
                          transition duration-200 ease-in-out
-                         focus: [#0F6B5C] dark:[#3FBE9F]  focus:outline-none focus:ring-2 focus: ring-[#0F6B5C] dark:ring-[#3FBE9F]
+                         focus: [#0F6B5C] dark:[#3FBE9F]  focus:outline-hidden focus:ring-2 focus: ring-[#0F6B5C] dark:ring-[#3FBE9F]
                          disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
             />
           </div>
@@ -85,7 +85,7 @@ const isDark = theme === "dark";
             disabled={isLoading || !groupName.trim()}
             className="group relative flex w-full justify-center rounded-lg bg-[#0F6B5C] px-4 py-3 
                        text-sm font-semibold text-white transition duration-200 ease-in-out 
-                       hover:bg-[#0c5449] focus-visible:outline focus-visible:outline-2 
+                       hover:bg-[#0c5449] focus-visible:outline-solid focus-visible:outline-2 
                        focus-visible:outline-offset-2 focus-visible:outline-indigo-600 
                        disabled:cursor-not-allowed "
           >
