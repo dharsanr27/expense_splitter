@@ -2,7 +2,7 @@ import axios from 'axios';
 
 //base URL
 const  API = axios.create({
-    baseURL:'https://expense-splitter-api-nxou.onrender.com/api/'
+    baseURL:'https://expense-splitter-api-nxou.onrender.com/api'
 });
 //attached the request interceptor
 API.interceptors.request.use((config)=>
