@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import {Link} from "react-router-dom"
 import { useNavigate } from "react-router-dom";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -81,9 +82,9 @@ function Login() {
 
         <p className="text-center text-sm">
           Don't have an account?{" "}
-          <a href="/signup" className="font-medium hover:underline">
+          <Link to="/signup" className="font-medium hover:underline">
             Sign Up
-          </a>
+          </Link>
         </p>
       </form>
     </CardContent>
