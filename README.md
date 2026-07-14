@@ -35,11 +35,9 @@ The application utilizes a relational PostgreSQL database schema structured to m
 
 ```mermaid
 erDiagram
-    USERS {
-        serial id PK
+    PROFILES {
+        uuid id PK
         varchar username
-        varchar email UK
-        varchar password
         timestamp created_at
     }
     GROUPS {
@@ -75,15 +73,15 @@ erDiagram
         timestamp created_at
     }
 
-    USERS ||--o{ GROUPS : "creates"
+    PROFILES ||--o{ GROUPS : "creates"
     GROUPS ||--|{ GROUP_MEMBERS : "has"
-    USERS ||--|{ GROUP_MEMBERS : "joins"
+    PROFILES ||--|{ GROUP_MEMBERS : "joins"
     GROUPS ||--o{ EXPENSES : "contains"
-    USERS ||--o{ EXPENSES : "pays"
+    PROFILES ||--o{ EXPENSES : "pays"
     EXPENSES ||--|{ SPLITS : "generates"
-    USERS ||--o{ SPLITS : "owes"
+    PROFILES ||--o{ SPLITS : "owes"
     GROUPS ||--o{ SETTLEMENTS : "tracks"
-    USERS ||--o{ SETTLEMENTS : "sends/receives"
+    PROFILES ||--o{ SETTLEMENTS : "sends/receives"
 ```
 
 ---
