@@ -1,15 +1,15 @@
 // Define the input (what your DB query returns)
 export interface UserBalance {
-  UserId: number;
+  UserId: string;
   UserName: string;
   NetBalanceAmount: number;
 }
 
 // Define the output (what React needs to show the UI)
 export interface SimplifiedDebt {
-  fromUserId: number;
+  fromUserId: string;
   fromUserName: string;
-  toUserId: number;
+  toUserId: string;
   toUserName: string;
   amount: number;
 }
@@ -48,7 +48,7 @@ export function calculateSimplifiedDebts(balances: UserBalance[]): SimplifiedDeb
       fromUserName: debtor.UserName,
       toUserId: creditor.UserId,
       toUserName: creditor.UserName,
-      amount: parseFloat(settleAmount.toFixed(2)) // Keep it clean for currency
+      amount: settleAmount // Keep it clean for currency
     });
 
     // Deduct the settled amount from both balances

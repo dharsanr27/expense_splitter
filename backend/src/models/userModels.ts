@@ -1,48 +1,21 @@
-import pool from "../config/database";
-import {User} from "../types/index";
-//1. creating a user
-export async function createUser(
-  username:string,
-  email:string,
-  password:string):Promise<User> {
- 
+import {db} from "../db";
+import { profiles } from "../db/schema";
+import { ilike } from "drizzle-orm";
+import { Profiles } from "../types";
+export async function getUserByName(userName:string):Promise<Profiles[]> {
   try {
-    const sql = `INSERT INTO users(username,email,password)
-    VALUES($1,$2,$3)
-    RETURNING id,username,email,created_at;`;
-    const result = await pool.query<User>(sql, [username, email, password]);
-    return result.rows[0];
+   
+    const result = await db
+    .select({
+      id:profiles.id,
+      username:profiles.username,
+    })
+    .from(profiles)
+    .where(ilike(profiles.username,`%${userName}%`))
+    .limit(10);
+    return result;
   } catch (error) {
-    console.error("Error in creatUser model:", error);
-    throw error;
-  }
-}
-//2.Authentication(user login)
-export async function getUserByEmail(email:string):Promise<User | null> {
-  try {
-    const sql = `
-    SELECT * FROM users
-    WHERE email=$1;
-    `;
-    const result = await pool.query<User>(sql, [email]);
-    return result.rows[0];
-  } catch (error) {
-    console.error("Error in getUserByEmail model:", error);
-    throw error;
-  }
-}
-export async function getUserByName(userName:string):Promise<User[] | null> {
-  try {
-    const sql = `
-    SELECT id,username,email  FROM users
-    WHERE username ILike $1
-    LIMIT 10;
-    
-    `;
-    const result = await pool.query<User[]>(sql, [`%${userName}%`]);
-    return result.rows;
-  } catch (error) {
-    console.error("Error in getUserByEmail model:", error);
+    console.error("Error in getUserByName model:", error);
     throw error;
   }
 }

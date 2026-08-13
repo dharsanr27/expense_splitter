@@ -2,16 +2,16 @@ import { Request, Response } from "express";
 import { getUserGroupBalance } from '../models/expenseModel';
 import { calculateSimplifiedDebts } from '../utils/deptCalculator';
 
-export const getGroupDashboardData = async (req: Request, res: Response) => {
+export const getGroupDashboardData = async (req: Request, res: Response):Promise<void> => {
   try {
     const groupId = Number(req.params.groupId);
 
     // 1. Fetch raw balances from PostgreSQL (The query we wrote earlier)
     const rawBalances = await getUserGroupBalance(groupId);
-
+// console.log(rawBalances)
     // 2. Pass the raw balances into the memory algorithm
     const simplifiedTransactions = calculateSimplifiedDebts(rawBalances);
-
+// console.log(simplifiedTransactions);
     // 3. Send everything to React
      res.status(200).json({
       success: true,

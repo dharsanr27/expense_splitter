@@ -3,7 +3,7 @@ import { BaseResponse } from "./common.types";
 export interface ExpenseCreation{
   expenseId: number;
   groupId: number;
-  paidBy: number;
+  paidBy: string;
   totalAmount: number;
   splitAmount: number;
   totalMembers: number;
@@ -11,7 +11,7 @@ export interface ExpenseCreation{
 export interface GroupBalance{
   GroupId: number;
   GroupName: string;
-  UserId:number;
+  UserId:string;
   UserName: string;
   TotalAmountPaid: number;
   TotalAmountOwed: number;

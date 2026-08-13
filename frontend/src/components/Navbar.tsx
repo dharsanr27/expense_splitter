@@ -31,7 +31,7 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <nav className="gm-navbar">
+    <nav className="gm-navbar ">
       <span className="gm-navbar-brand">Expense-Split</span>
       <button
         type="button"

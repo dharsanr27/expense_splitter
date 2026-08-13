@@ -1,17 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import {useState} from 'react';
 import { useTheme } from "./ThemeContext";
 import "./Login.css";
-import API from "../api/axios";
+import {FcGoogle} from "react-icons/fc";
+import { supabase } from "@/lib/supabase";
 
 function Login() {
     const{theme}=useTheme();
     const navigate = useNavigate();
     const [email,setEmail]=useState("");
     const [password,setPassword]=useState("");
+    const[err,setErr]=useState("");
     const handleEmail = ((event)=>{setEmail(event.target.value)});
     const handlePassword =((event)=>{setPassword(event.target.value)});
     //connection
@@ -29,26 +31,52 @@ function Login() {
   e.preventDefault();
 
  try{
-    const response = await API.post("/users/login",{
-        email,
-        password
-    });
-    localStorage.setItem("token",response.data.token);
-    localStorage.setItem("userId", String(response.data.data.id));
-    localStorage.setItem("userName", response.data.data.username);
+//   if (!email.trim()) {
+//     setErr("Email is required");
+//     return;
+// }
+// if (!password.trim()) {
+//     setErr("Password is required");
+//     return;
+// }
+   const {  error } = await supabase.auth.signInWithPassword({ email, password });
+   
+   
 
-     console.log(response.data);
-     navigate('/dashboard')
+    //  console.log(data);
+     console.log(error);
+    if(error)
+    {
+      setErr(`${error.message}`);
+    }
+    else{
+      navigate('/dashboard');
+    }
+    
  }catch(error)
  {
     console.error(error);
  }
-
-  
-
 };
+ const handleGoogleLogin = async () =>{
+      
+      const {error}= await supabase.auth.signInWithOAuth({
+        provider:'google',
+        options:{
+          redirectTo:`${window.location.origin}/dashboard`
+        }
+      });
+      const {data: {session}} = await supabase.auth.getSession();
+    if(error)
+    {
+      setErr(error.message);
+    }
+    const userId = session?.user.id;
+    console.log(userId);
+      if(error) console.error(error.message);
+    };
   return (
-   <div className="Login-app" data-theme={theme}>
+   <div className="Login-app min-h-screen flex items-center justify-center px-4" data-theme={theme}>
   <Card className="w-[400px] shadow-xl border">
     <CardHeader className="text-center pb-2">
       <CardTitle className="text-3xl p-2">
@@ -58,6 +86,11 @@ function Login() {
         Sign-in to continue to your account
       </p>
     </CardHeader>
+    {err && (
+  <p className=" text-center text-red-500 text-sm mt-2">
+    {err}
+  </p>
+)}
 
     <CardContent className="space-y-5 p-6">
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -75,15 +108,17 @@ function Login() {
           onChange={handlePassword}
         />
 
-        <Button type="submit" className="w-full">
+        <Button type="submit" className=" bg-[#0F6B5C] hover:bg-[#0c5449] w-full cursor-pointer">
           Login
         </Button>
+        <hr></hr>
+        <Button type="button" onClick={handleGoogleLogin} className="w-full hover:underline cursor-pointer"><FcGoogle size={20} />Sign in with Google</Button>
 
         <p className="text-center text-sm">
           Don't have an account?{" "}
-          <a href="/signup" className="font-medium hover:underline">
+          <Link to="/signup" className="font-medium hover:underline">
             Sign Up
-          </a>
+          </Link>
         </p>
       </form>
     </CardContent>

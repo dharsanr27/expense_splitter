@@ -1,9 +1,11 @@
+
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import debounce from "lodash.debounce";
 import API from "@/api/axios";
 import "./GroupMembersList.css";
 import { useTheme } from "./ThemeContext";
+import { supabase } from "@/lib/supabase";
 
 // Purely presentational helpers — generate a stable initial + colour per
 // username so each member gets a consistent avatar across renders.
@@ -29,10 +31,25 @@ const getAvatarColor = (name = "") => {
 
 
 const GroupMembersList = () => {
-  const { groupId } = useParams();
-  const currentUserId = Number(localStorage.getItem("userId"));
+  //try to remove this currentuserid instead do it in backend
+  const[currentUserId,setCurrentUserId]=useState<string | null>(null);
+   useEffect(() => {
+    async function getUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
+      setCurrentUserId(user?.id ?? null);
+    }
+
+    getUser();
+  }, []);
+
+
+  const { groupId } = useParams();
+ 
   // --- STATE MANAGEMENT ---
+  
   const [members, setMembers] = useState([]);
   const [balance, setBalance] = useState([]);
   const [simplifiedDebts, setSimplifiedDebts] = useState([]);
@@ -64,7 +81,11 @@ const GroupMembersList = () => {
     try {
       setLoading(true);
       setError("");
+     
+ 
+      console.time("fetch members");
       const response = await API.get(`/groups/groupMembers/${groupId}`);
+      console.timeEnd("fetch members");
       const response2 = await API.get(
         `/dashboardData/userDataAndBalance/${groupId}`,
       );
@@ -222,16 +243,19 @@ const GroupMembersList = () => {
     }, {});
   }, [balance]);
   // 1. Debts where I have to pay money
+   
   const myDebts = useMemo(() => {
+   
     return simplifiedDebts.filter(
-      (debt) => debt.fromUserId === Number(currentUserId),
+      (debt) =>  debt.fromUserId ===currentUserId,
     );
+    
   }, [simplifiedDebts, currentUserId]);
 
   // 2. Debts where I am waiting to receive money
   const myCredits = useMemo(() => {
     return simplifiedDebts.filter(
-      (debt) => debt.toUserId === Number(currentUserId),
+      (debt) => debt.toUserId === currentUserId,
     );
   }, [simplifiedDebts, currentUserId]);
 
@@ -239,8 +263,8 @@ const GroupMembersList = () => {
   const otherDebts = useMemo(() => {
     return simplifiedDebts.filter(
       (debt) =>
-        debt.fromUserId !== Number(currentUserId) &&
-        debt.toUserId !== Number(currentUserId),
+        debt.fromUserId !== currentUserId &&
+        debt.toUserId !== currentUserId,
     );
   }, [simplifiedDebts, currentUserId]);
 
@@ -473,6 +497,8 @@ const GroupMembersList = () => {
                 </button>
               </form>
             </section>
+            
+            <Link to={`/groupExpenses/${groupId}`} className="inline-flex items-center gap-2 text-blue-100 hover:text-blue-200 font-medium"> 📄 View All Expenses → </Link>
           </div>
         </div>
 

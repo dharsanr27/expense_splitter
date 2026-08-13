@@ -1,3 +1,5 @@
+//production db
+
 import dotenv from "dotenv";
 dotenv.config();
 import { Pool } from 'pg';
@@ -15,6 +17,7 @@ pool.on('error', (err) => {
 
 export default pool;
 
+//local db
 
 // import { Pool } from  "pg";
 // import dotenv from "dotenv";

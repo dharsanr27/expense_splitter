@@ -4,8 +4,9 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useTheme } from "./ThemeContext";
 import "./Signup.css";
-import API from "../api/axios";
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
+import {FcGoogle} from "react-icons/fc";
 
 function Login() {
   const navigate = useNavigate();
@@ -22,13 +23,23 @@ function Login() {
       const formData = new FormData(e.target);
         const username=formData.get("username");
         try{
-           const response = await API.post("/users/register",
-            {
-             username,
+          //  const response = await API.post("/users/register",
+          //   {
+          //    username,
+          //   email,
+          //   password
+          //   });
+          //change 1
+          const {data,error} = await supabase.auth.signUp({
             email,
-            password
-            });
-          console.log(response.data); 
+            password,
+            options:{data:{username}}
+          });
+          if(error){
+            console.error(error.message);
+            return;
+          }
+          console.log(data); 
           navigate('/');
         }
         catch(error)
@@ -36,6 +47,16 @@ function Login() {
           console.error(error);
         }
     }
+    const handleGoogleLogin = async () =>{
+      const {error}= await supabase.auth.signInWithOAuth({
+        provider:'google',
+        options:{
+          redirectTo:`${window.location.origin}/dashboard`
+        }
+      });
+      if(error) console.error(error.message);
+    };
+   
   return (
     <div className="Signup-app" data-theme={theme}>
       <Card className="w-[400px] shadow-xl border">
@@ -48,7 +69,11 @@ function Login() {
             <Input name="username" type="username" placeholder="Username" />
             <Input type="email" placeholder="Email" onChange={handleEmail} value={email} />
             <Input type="password" placeholder="Password" onChange={handlePassword} value={password}/>
-            <Button className="w-full">Sign Up</Button>
+            <Button className="bg-[#0F6B5C] hover:bg-[#0c5449] w-full cursor-pointer">Sign Up</Button>
+            <hr>
+            </hr>
+            <Button onClick={handleGoogleLogin} className="w-full hover:underline cursor-pointer"><FcGoogle size={20} />Sign up with Google</Button>
+            
           </form>
         </CardContent>
       </Card>

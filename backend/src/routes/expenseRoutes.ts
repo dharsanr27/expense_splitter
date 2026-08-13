@@ -1,5 +1,6 @@
 import express,{Router} from "express";
 import {
+  handleAllExpense,
   handleExpenseWithSplitCreation,
   handleUserBalance
  
@@ -9,6 +10,7 @@ import validate from "../middlewares/validateMiddleware";
 import errorMiddleware from "../middlewares/errorMiddleware";
 import {
   UserBalanceSchema,
+  expenseSchema,
   expenseSplitSchema,
 } from "../schemas/expenseSchemas";
 const router:Router = express.Router();
@@ -24,6 +26,6 @@ router.get(
   validate(UserBalanceSchema),
   handleUserBalance,
 );
-
+router.get("/groupExpense/:groupId",auth,validate(expenseSchema),handleAllExpense)
 router.use(errorMiddleware);
 export default router;

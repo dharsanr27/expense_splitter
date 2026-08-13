@@ -1,48 +1,53 @@
 //does we need to add pool to every models
-import { promises } from "node:dns";
-import pool from "../config/database";
-import {Group,GroupMember} from "../types/index";
-//1.Create group
-export async function createGroup(groupName:string,createdBy:number):Promise<Group>
-{
-    const client = await pool.connect();
-    try{
-        await client.query("BEGIN");
+// import { promises } from "node:dns";
+import { InferSelectModel,eq } from "drizzle-orm";
+import {db} from "../db";
+import {profiles,groups,groupMembers} from "../db/schema";
 
-        const  GroupCreatSql=`
-        insert into groups(name,created_by)
-        values($1,$2)
-        returning *;`;
-        const result = await client.query(GroupCreatSql,[groupName,createdBy]);
-        const groupId = result.rows[0].id;
-        const MemberaddSql=`
-        insert into group_members(group_id,user_id)
-        values($1,$2)
-        returning *;`;
-        const AddResult = await client.query(MemberaddSql,[groupId,createdBy]);
-        await client.query("COMMIT");
-        return result.rows[0];
+
+//1.Create group
+type Group = InferSelectModel<typeof groups>;
+export async function createGroup(groupName:string,createdBy:string):Promise<Group>
+{
+    
+    try{
+        const newGroup = await db.transaction(async (tx) =>{
+            const [group] = await tx 
+            .insert(groups)
+            .values({name:groupName, createdBy })
+            .returning();
+
+        await tx
+            .insert(groupMembers)
+            .values({groupId: group.id, userId: createdBy})
+            .returning();
+
+        return group;
+        });
+
+        return newGroup;
+       
     }
     catch(error)
     {
-        await client.query("ROLLBACK");
+        
         console.error("Error in createGroup model",error);
         throw error;
     }
-    finally{
-        client.release();
-    }
+    
 }
 //2.ADD members to the group
-export async function addMemberToGroup(groupId:number,userId:number):Promise<GroupMember>
+type GroupMember = InferSelectModel<typeof groupMembers>;
+export async function addMemberToGroup(groupId:number,userId:string):Promise<GroupMember>
 {
     try{
-        const sql = `
-        insert into group_members(group_id,user_id)
-        values($1,$2)
-        returning *;`;
-        const result = await pool.query(sql,[groupId,userId]);
-        return result.rows[0];
+        
+        const [member] = await db
+        .insert(groupMembers)
+        .values({groupId,userId})
+        .returning();
+        
+        return member;
     }
     catch(error)
     {
@@ -50,37 +55,55 @@ export async function addMemberToGroup(groupId:number,userId:number):Promise<Gro
         throw error;
     }
 }
+
+
 //3.members in the group
-
-
-export async function memberList(groupId:number):Promise<any>
+ interface Member {
+    id: string;
+    username: string;
+}
+export async function memberList(groupId:number):Promise<Member[]>
 {
     try{
-        const sql = `select id,username from users as u
-        join group_members as gm on u.id=gm.user_id
-        where group_id=$1;`;
-        const result= await pool.query(sql,[groupId]);
-        return result.rows;
+        // console.time("DB");
+        const result= await db
+        .select({
+            id:profiles.id,
+            username:profiles.username,
+        })
+        .from(profiles)
+        .innerJoin(groupMembers,eq(profiles.id,groupMembers.userId))
+        .where(eq(groupMembers.groupId,groupId));
+         console.timeEnd("DB");
+        return result;
     }
     catch(error)
     {
-        console.error("Error in memberList model:",error)
+        console.error("Error in memberList model:",error);
+         throw error;
     }
 }
 
 //4.user group they are in
-export async function userGroups(userId:number):Promise<any>
+ interface UserGroup {
+    id: number;
+    name: string;
+}
+export async function userGroups(userId:string):Promise<UserGroup[]>
 {
     try{
-         const sql=`select id,name from groups
-         join group_members on groups.id=group_members.group_id
-        where user_id=$1;`;
-        const result =await pool.query(sql,[userId]);
-        return result.rows;
+        const result =await db
+        .select({id:groups.id,name:groups.name})
+        .from(groups)
+        .innerJoin(groupMembers,eq(groups.id,groupMembers.groupId))
+        .where(eq(groupMembers.userId,userId))
+        return result;
     }
     catch(error)
     {
         console.error("Error in userGroups model:",error);
+        throw error;
     }
   
 }
+  //Task1:remove all the promise<any>

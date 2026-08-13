@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import API from '../api/axios'; // Import your custom client
 import { useTheme } from "./ThemeContext";
+import { useNavigate } from "react-router-dom";
 
 const CreateGroup = () => {
   const [groupName, setGroupName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const { theme } = useTheme();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,6 +22,7 @@ const CreateGroup = () => {
       
       setMessage({ type: 'success', text: 'Group created successfully!' });
       setGroupName(''); // Reset input on success
+      navigate('/dashboard');
     } catch (error) {
       const errorMsg = error.response?.data?.message || error.message || 'Something went wrong';
       console.error('Failed to create group:', errorMsg);

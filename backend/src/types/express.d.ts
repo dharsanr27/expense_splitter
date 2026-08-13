@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { UserPayload } from '../interfaces/auth'; 
+import { UserPayload } from './index'; 
 
 declare global {
   namespace Express {

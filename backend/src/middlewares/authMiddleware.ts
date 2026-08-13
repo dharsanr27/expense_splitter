@@ -1,44 +1,25 @@
-//why ai generated code gives require without .js extension
-import jwt from 'jsonwebtoken';
-import {Request,Response,NextFunction}from "express";
-
-export interface AuthenticatedRequest extends Request{
-    user?:string | jwt.JwtPayload
-}
-export function auth(req:AuthenticatedRequest,res:Response,next:NextFunction):void | Response
-{    
-    console.log("====================================");
-    console.log("1. Incoming URL:", req.originalUrl);
-    console.log("2. ALL HEADERS:", req.headers); // Tells us everything the client sent
-    console.log("3. AUTH HEADER VALUE:", req.header('Authorization'));
-    console.log("====================================");
-    const authHeader = req.header('Authorization');//what is the use of this line
-    if(!authHeader || !authHeader.startsWith('Bearer'))//what is bearer
-    {
-       return res.status(401).json(
-        {
-            success:false,
-            message:'No token,authorization denied'
-        }
-       )
-    }
-    const token = authHeader.split(' ')[1];
-    try{
-        const decode =jwt.verify(token,process.env.JWT_SECRET);
-        req.user =decode;//what it will store
-        console.log("decoded JWT PAYLOAD IS:",decode);
-        console.log()
-        next();//why we need next how it know next where to go
-    }
-    catch(error)
-        {
-            console.error("Error in auth:",error)
-           return  res.status(401).json(
-                {
-                    message:'Token is invalid'
-                }
-             );
-        }
+import { Request,Response,NextFunction } from "express";
+import { supabase } from "../lib/supabase";
     
+export async function auth(req:Request,res:Response,next:NextFunction){
+console.time("auth");
+    const authHeader = req.headers.authorization;//what it contain
+    const token = authHeader?.split(' ')[1];//why ?
+    if(!token){
+        return res.status(401).json({error:'No token provided'});
+    }
+    const {data,error}= await supabase.auth.getUser(token);
 
+    if(error || !data.user){
+        return res.status(401).json({error:'Invalid or expired token'});
+    }
+    const {
+  data: { session },
+} = await supabase.auth.getSession();
+
+console.log(session?.access_token);
+    
+    req.user = {userId:data.user.id};
+    next();
+ console.timeEnd("auth");   
 }

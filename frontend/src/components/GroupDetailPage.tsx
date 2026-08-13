@@ -33,14 +33,14 @@ const GroupsListPage = () => {
   if (loading) {
     return (
       <div className={isDark ? "dark" : ""} data-theme={theme}>
-        <div className="min-h-screen bg-[#faf6ee] dark:bg-[#11161A] px-4 py-8 sm:px-6 lg:px-8 transition-colors">
+        <div className="min-h-screen bg-[#F2F4F1] dark:bg-[#11161A] px-4 py-8 sm:px-6 lg:px-8 transition-colors">
           <div className="mx-auto max-w-4xl">
-            <div className="h-8 w-48 animate-pulse rounded-lg bg-[#ece4d3] dark:bg-[#11161A] mb-6"></div>
+            <div className="h-8 w-48 animate-pulse rounded-lg bg-[#FFFFFF] dark:bg-[#11161A] mb-6"></div>
             <div className="grid gap-4 sm:grid-cols-2">
               {[1, 2, 3, 4].map((n) => (
                 <div
                   key={n}
-                  className="h-24 animate-pulse rounded-2xl bg-[#f2ead9] dark:bg-[#11161A] border border-[#e4d9c2] dark:border-[#2D383F] p-5"
+                  className="h-24 animate-pulse rounded-2xl bg-[#FFFFFF] dark:bg-[#11161A] border border-[#D9DED7] dark:border-[#2D383F] p-5"
                 ></div>
               ))}
             </div>

@@ -1,30 +1,28 @@
-import { JwtPayload } from 'jsonwebtoken';
 
-export interface User{
-    id:number;
+
+export interface Profiles{
+    id:string;
     username:string;
-    email:string;
     created_at?:Date;
-    password?:string;
 }
 
 export interface Group{
    id: number;
    name: string;
-   created_by: number;
+   created_by: string;
    created_at?: Date;
 }
 
 export interface GroupMember{
     group_id:number ;
-    user_id:number ;
+    user_id:string ;
     joined_at?:Date ;
 }
 // 3. The Expense Entity
 export interface Expense {
     id: number;
     group_id: number;
-    paid_by: number;
+    paid_by: string;
     description: string;
     amount: number;
     created_at?: Date;
@@ -34,13 +32,13 @@ export type SplitStatus = 'pending' | 'paid' | 'cancelled';
 export interface Split {
     id: number;
     expense_id: number;
-    user_id: number;
+    user_id: string;
     amount_owed: number;
     status:SplitStatus;
 }
 
-export interface UserPayload extends JwtPayload {
-    userId: number;
+export interface UserPayload  {
+    userId: string;
     // email: string;
     // role: 'admin' | 'user';
 }

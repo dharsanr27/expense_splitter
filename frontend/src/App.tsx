@@ -5,6 +5,7 @@ import CreateGroup from "./components/CreateGroup";
 import GroupDetailPage from "./components/GroupDetailPage";
 import GroupMembersList from "./components/GroupMembersList";
 import Dashboard from "./components/Dashboard";
+import GroupExpenseList from "./components/GroupExpenseList"
 import { ThemeProvider } from "./components/ThemeContext";
 import Navbar from "./components/Navbar";
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/groups/:groupId" element={<GroupMembersList/>}/>
         <Route path="/groupDetails" element={<GroupDetailPage/>}/>
         <Route path="/dashboard" element={<Dashboard/>}/>
+        <Route path="/groupExpenses/:groupId" element={<GroupExpenseList/>}/>
       </Routes>
     </BrowserRouter>
     </ThemeProvider>

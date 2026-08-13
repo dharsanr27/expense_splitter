@@ -8,8 +8,12 @@ const  validate=(schema:AnyZodObject) =>
     {
  try{
     //pass the req.body to the schema
-    const result = await schema.parseAsync(req.body)
-    req.body =result;
+    const result = await schema.parseAsync({
+        body:req.body,
+    params:req.params,
+query:req.query});
+    req.body =result.body;
+    req.params = result.params as any;
     console.log("✅ Zod Validation Passed successfully!");
     next();
 

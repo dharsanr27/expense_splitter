@@ -10,11 +10,24 @@ import dashboardRouter from "./routes/dashboardRoutes"
 import cors from "cors";
 import rateLimit from "./middlewares/rateLimitMiddleware";
 
+
 const app = express();
 // 2. Middleware (The "Security & Parsing" layer)
 app.use(cors());
 app.use(express.json());
 app.use(rateLimit);
+
+app.use((req, res, next) => {
+  const start = performance.now();
+
+  res.on("finish", () => {
+    console.log(
+      `${req.method} ${req.originalUrl} - ${(performance.now() - start).toFixed(2)} ms`
+    );
+  });
+
+  next();
+});
 
 // 3. The "Health Check" Route
 app.get("/ping", (req: Request, res: Response) => {

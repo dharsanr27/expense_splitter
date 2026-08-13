@@ -1,9 +1,14 @@
 import { createContext, useContext, useState, useEffect } from "react";//task1:know why we use thes custom hooks
 
-const ThemeContext = createContext();
+type Theme = "light" | "dark";
+type ThemeContextType = {
+  theme:Theme;
+  toggleTheme: () => void;
+};
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
+  const [theme, setTheme] = useState<Theme>(() => {
     const saved = localStorage.getItem("gm-theme");
     if (saved === "light" || saved === "dark") return saved;
     return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";

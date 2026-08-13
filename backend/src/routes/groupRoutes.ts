@@ -6,12 +6,13 @@ import {
   handleUserGroups,
 } from "../controllers/groupControllers";
 import { auth } from "../middlewares/authMiddleware";
+import { verifyGroupMember } from "../middlewares/verifyMemberMiddleware";
 //why we are calling express.Router() instead express.Router
 const router:Router = express.Router();
 //I need to name the endpoints on user perspective or developer perspective
 router.post("/createGroup", auth, handleCreateGroup);
 router.post("/addMember/:groupId", auth, handleAddMember);
-router.get("/groupMembers/:groupId",auth,handleMemberList);
+router.get("/groupMembers/:groupId",auth,verifyGroupMember,handleMemberList);
 router.get("/userGroups",auth,handleUserGroups);
 export default  router;
 
