@@ -7,6 +7,8 @@ import { useTheme } from "./ThemeContext";
 import "./Login.css";
 import {FcGoogle} from "react-icons/fc";
 import { supabase } from "@/lib/supabase";
+import type { ChangeEvent,SubmitEvent } from "react";
+
 
 function Login() {
     const{theme}=useTheme();
@@ -14,8 +16,8 @@ function Login() {
     const [email,setEmail]=useState("");
     const [password,setPassword]=useState("");
     const[err,setErr]=useState("");
-    const handleEmail = ((event)=>{setEmail(event.target.value)});
-    const handlePassword =((event)=>{setPassword(event.target.value)});
+    const handleEmail = ((event: ChangeEvent<HTMLInputElement>)=>{setEmail(event.target.value)});
+    const handlePassword =((event: ChangeEvent<HTMLInputElement>)=>{setPassword(event.target.value)});
     //connection
 //     const handle = async(e)=>
 
@@ -26,7 +28,7 @@ function Login() {
        
 //         console.log(response1.data);
 //     }
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e:SubmitEvent<HTMLFormElement>) => {
         //what this e arguments denoting what it contains:task 1
   e.preventDefault();
 
