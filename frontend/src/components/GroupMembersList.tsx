@@ -6,6 +6,8 @@ import API from "@/api/axios";
 import "./GroupMembersList.css";
 import { useTheme } from "./ThemeContext";
 import { supabase } from "@/lib/supabase";
+import type { Member,Balance,Settlement } from "@/types/group";
+import type { ChangeEvent,SubmitEvent } from "react";
 
 // Purely presentational helpers — generate a stable initial + colour per
 // username so each member gets a consistent avatar across renders.
@@ -47,28 +49,34 @@ const GroupMembersList = () => {
 
 
   const { groupId } = useParams();
+
+const numericGroupId = Number(groupId);
+
+if (!Number.isFinite(numericGroupId)) {
+  return;//optimize it
+}
  
   // --- STATE MANAGEMENT ---
   
-  const [members, setMembers] = useState([]);
-  const [balance, setBalance] = useState([]);
-  const [simplifiedDebts, setSimplifiedDebts] = useState([]);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [balance, setBalance] = useState<Balance[]>([]);
+  const [simplifiedDebts, setSimplifiedDebts] = useState<Settlement[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<Member[]>([]);
   const [error, setError] = useState("");
 
   // Track the actual user object selected from the dropdown
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState<Member | null>(null);
   const [searchTerm1, setSearchTerm1] = useState("");
   const [showPaidDropdown, setShowPaidDropdown] = useState(false);
-  const [selectedUser1, setSelectedUser1] = useState(null);
+  const [selectedUser1, setSelectedUser1] = useState<Member | null>(null);
   const [amountPaid, setAmountPaid] = useState("");
   const [description, setDescription] = useState("");
   const [actionMessage, setActionMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeSettleDebt, setActiveSettleDebt] = useState(null);
+  const [activeSettleDebt, setActiveSettleDebt] = useState<Settlement | null>(null);
   const [isSettling, setIsSettling] = useState(false);
 
   // Theme is purely presentational state — defaults to the system
@@ -94,9 +102,10 @@ const GroupMembersList = () => {
       setSimplifiedDebts(response2.data.data.settlements || []);
     } catch (err) {
       const errorMsg =
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to fetch group details";
+    err instanceof Error
+      ? err.message
+      :"Failed to fetch group details";
+      console.error("Failed to fetch group details", errorMsg);
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -107,7 +116,7 @@ const GroupMembersList = () => {
     fetchGroupData();
   }, [fetchGroupData]);
 
-  const handleSearchUsers = async (query) => {
+  const handleSearchUsers = async (query:string) => {
     if (!query || !query.trim()) {
       setResults([]);
       return;
@@ -133,7 +142,7 @@ const GroupMembersList = () => {
     return () => debouncedSearch.cancel();
   }, [debouncedSearch]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
 
@@ -148,13 +157,13 @@ const GroupMembersList = () => {
     debouncedSearch(value);
   };
 
-  const handleSelectUser = (user) => {
+  const handleSelectUser = (user:Member) => {
     setSearchTerm(user.username);
     setSelectedUser(user);
     setResults([]); // Hide dropdown immediately after selection
   };
 
-  const handleAddMember = async (e) => {
+  const handleAddMember = async (e:SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!selectedUser) {
@@ -180,20 +189,24 @@ const GroupMembersList = () => {
       setSearchTerm("");
       setSelectedUser(null);
     } catch (err) {
-      const errorMsg = err.response?.data?.message || "Failed to add member";
+      const errorMsg = 
+      err instanceof Error
+      ?err.message
+      :"Failed to add member"
+    console.error("Failed to add member", errorMsg);
       setError(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
   };
   //add new  expense
-  const handleAmountPaid = (e) => {
+  const handleAmountPaid = (e:ChangeEvent<HTMLInputElement>) => {
     setAmountPaid(e.target.value);
   };
-  const handleDescription = (e) => {
+  const handleDescription = (e:ChangeEvent<HTMLInputElement>) => {
     setDescription(e.target.value);
   };
-  const handleAddExpense = async (e) => {
+  const handleAddExpense = async (e:SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedUser1) {
       setError("Please select a user from the list first.");
@@ -214,16 +227,20 @@ const GroupMembersList = () => {
       setDescription("");
       setShowPaidDropdown(false);
     } catch (err) {
-      const errorMsg = err.response?.data?.message || "Failed to add expense:";
+      const errorMsg = 
+      err instanceof Error
+      ?err.message
+      :"Failed to add expense:"
+      console.error("Failed to add expense:",errorMsg)
       setError(errorMsg);
     }
   };
-  const handleSelectUser1 = (user) => {
+  const handleSelectUser1 = (user:Member) => {
     setSearchTerm1(user.username);
     setSelectedUser1(user);
     setShowPaidDropdown(false); // Hide dropdown immediately after selection
   };
-  const handlePaidUser = (e) => {
+  const handlePaidUser = (e:ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm1(value);
     if (!value.trim()) {
@@ -237,7 +254,7 @@ const GroupMembersList = () => {
     member.username.toLowerCase().includes(searchTerm1.toLowerCase()),
   );
   const balanceMap = useMemo(() => {
-    return balance.reduce((acc, currBalance) => {
+    return balance.reduce<Record<string,Balance>>((acc, currBalance) => {
       acc[currBalance.UserId] = currBalance;
       return acc;
     }, {});
@@ -268,7 +285,7 @@ const GroupMembersList = () => {
     );
   }, [simplifiedDebts, currentUserId]);
 
-  const handleSettleUp = async (groupId, fromUserId, toUserId, amount) => {
+  const handleSettleUp = async (groupId:number, fromUserId:string, toUserId:string, amount:number) => {
     try {
       setIsSettling(true);
       setError("");
@@ -602,7 +619,7 @@ const GroupMembersList = () => {
                 disabled={isSettling}
                 onClick={async () => {
                   await handleSettleUp(
-                    groupId,
+                    numericGroupId,
                     activeSettleDebt.fromUserId,
                     activeSettleDebt.toUserId,
                     activeSettleDebt.amount,

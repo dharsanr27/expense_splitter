@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";//task1:know why we use thes custom hooks
+import { createContext, useContext, useState, useEffect,type ReactNode } from "react";//task1:know why we use thes custom hooks
 
 type Theme = "light" | "dark";
 type ThemeContextType = {
@@ -7,7 +7,7 @@ type ThemeContextType = {
 };
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider = ({ children }) => {
+export const ThemeProvider = ({ children }:{children:ReactNode}) => {
   const [theme, setTheme] = useState<Theme>(() => {
     const saved = localStorage.getItem("gm-theme");
     if (saved === "light" || saved === "dark") return saved;
@@ -27,4 +27,12 @@ export const ThemeProvider = ({ children }) => {
   );
 };
 
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+
+  if (!context) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+
+  return context;
+};

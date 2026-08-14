@@ -1,6 +1,6 @@
 /* @import "tw-animate-css"; */
-@import '@fontsource-variable/geist' layer(base);
-@import 'tailwindcss';
+@import "@fontsource-variable/geist" layer(base);
+@import "tailwindcss";
 
 @plugin 'tailwindcss-animate';
 

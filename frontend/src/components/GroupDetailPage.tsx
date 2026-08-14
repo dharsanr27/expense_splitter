@@ -4,7 +4,14 @@ import { Link } from 'react-router-dom';
 import { useTheme } from "./ThemeContext";
 
 const GroupsListPage = () => {
-  const [userGroups, setUserGroups] = useState([]);
+
+type UserGroup = {
+  id: number;
+  name: string;
+};
+
+
+  const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const { theme } = useTheme();

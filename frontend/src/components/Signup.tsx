@@ -7,6 +7,9 @@ import "./Signup.css";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import {FcGoogle} from "react-icons/fc";
+import type { ChangeEvent,SubmitEvent } from "react";
+
+
 
 function Login() {
   const navigate = useNavigate();
@@ -15,10 +18,10 @@ function Login() {
  
   const[password,setPassword]=useState("");
   const {theme} = useTheme();
-  const handleEmail=event=>{setEmail(event.target.value)};
+  const handleEmail=(event: ChangeEvent<HTMLInputElement>)=>{setEmail(event.target.value)};
   // const handleUserName=event=>{setUserName(event.target.value)};
-  const handlePassword=event=>{setPassword(event.target.value)};
-    const handleSubmit = async (e)=>{
+  const handlePassword=(event: ChangeEvent<HTMLInputElement>)=>{setPassword(event.target.value)};
+    const handleSubmit = async (e:SubmitEvent<HTMLFormElement>)=>{
        e.preventDefault();
       const formData = new FormData(e.target);
         const username=formData.get("username");

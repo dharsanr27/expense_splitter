@@ -49,7 +49,13 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 function GroupExpenseList() {
-  const [groupExpenses, setGroupExpenses] = useState([]);
+  type Expense = {
+  Id: number;
+  UserName: string;
+  Description: string;
+  Amount: number;
+};
+  const [groupExpenses, setGroupExpenses] = useState<Expense[]>([]);
   const { groupId } = useParams();
   const { theme } = useTheme();
   const isDark = theme === "dark";
