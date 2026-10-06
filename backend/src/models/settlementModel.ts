@@ -35,8 +35,8 @@
 // }
 
 
-import { db } from "../db";
-import { expenses, settlements } from "../db/schema";
+import { db } from "../db/index.js";
+import { expenses, settlements } from "../db/schema.js";
 import { eq, and } from "drizzle-orm";
 
 export async function createSettlement(

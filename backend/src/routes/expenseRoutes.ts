@@ -4,15 +4,15 @@ import {
   handleExpenseWithSplitCreation,
   handleUserBalance
  
-} from "../controllers/expenseControllers";
-import { auth } from "../middlewares/authMiddleware";
-import validate from "../middlewares/validateMiddleware";
-import errorMiddleware from "../middlewares/errorMiddleware";
+} from "../controllers/expenseControllers.js";
+import { auth } from "../middlewares/authMiddleware.js";
+import validate from "../middlewares/validateMiddleware.js";
+import errorMiddleware from "../middlewares/errorMiddleware.js";
 import {
   UserBalanceSchema,
   expenseSchema,
   expenseSplitSchema,
-} from "../schemas/expenseSchemas";
+} from "../validates/expenseValidates.js";
 const router:Router = express.Router();
 router.post(
   "/createExpense",

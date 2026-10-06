@@ -1,20 +1,12 @@
-import { Request,Response } from "express";
-import {createSettlement } from "../models/settlementModel";
-export async function handleCreateSettlement(req:Request,res:Response):Promise<void>
+import { Request,Response,NextFunction } from "express";
+import {createSettlement } from "../models/settlementModel.js";
+import redisClient from "../config/redis.js";
+export async function handleCreateSettlement(req:Request,res:Response,next:NextFunction):Promise<void>
 {
 try{
     const {groupId,fromUserId,toUserId,amount}=req.body;
-    if(!groupId || !fromUserId || !toUserId || !amount)
-    {
-        res.status(401).json(
-            {
-                success:false,
-                message:"All fields are required"
-            }
-        );
-        return;
-    }
     const newSettlement = await createSettlement(groupId,fromUserId,toUserId,amount);
+    await redisClient.del(`group:${groupId}:dashboard`);
        res.status(201).json(
         {
             success:true,
@@ -27,12 +19,7 @@ try{
 catch(error)
 {
     console.error("Error in handleCreateSettlement controller:",error);
-     res.status(500).json(
-        {
-            success:false,
-            message:"Something went wrong on server"
-        }
-    )
+    next(error);
 
 }
 }

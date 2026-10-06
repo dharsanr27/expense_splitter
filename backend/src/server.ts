@@ -1,15 +1,16 @@
 import dotenv from "dotenv"; // 1. Load environment variables first
 dotenv.config();
 import express, { Request, Response } from "express";
-import pool from "./config/database";
-import userRouter from "./routes/userRoutes";
-import groupRouter from "./routes/groupRoutes";
-import expenseRouter from "./routes/expenseRoutes";
-import settlementRouter from "./routes/settlementRoutes";
-import dashboardRouter from "./routes/dashboardRoutes"
+import pool from "./config/database.js";
+import userRouter from "./routes/userRoutes.js";
+import groupRouter from "./routes/groupRoutes.js";
+import expenseRouter from "./routes/expenseRoutes.js";
+import settlementRouter from "./routes/settlementRoutes.js";
+import dashboardRouter from "./routes/dashboardRoutes.js"
 import cors from "cors";
-import rateLimit from "./middlewares/rateLimitMiddleware";
-
+import rateLimit from "./middlewares/rateLimitMiddleware.js";
+import "./config/redis.js";
+import redisClient from "./config/redis.js";
 
 const app = express();
 // 2. Middleware (The "Security & Parsing" layer)
@@ -17,13 +18,21 @@ app.use(cors());
 app.use(express.json());
 app.use(rateLimit);
 
+app.get("/redis-test", async (req, res) => {
+  await redisClient.set("message", "Hello from Redis");
+
+  const value = await redisClient.get("message");
+
+  res.json({ value });
+});
+
 app.use((req, res, next) => {
   const start = performance.now();
 
   res.on("finish", () => {
-    console.log(
-      `${req.method} ${req.originalUrl} - ${(performance.now() - start).toFixed(2)} ms`
-    );
+    // console.log(
+    //   `${req.method} ${req.originalUrl} - ${(performance.now() - start).toFixed(2)} ms`
+    // );
   });
 
   next();

@@ -19,9 +19,9 @@
 }
 
 
-.gm-app * {
+/* .gm-app * {
   box-sizing: border-box;
-}
+} */
 
 .gm-shell {
   max-width: 560px;

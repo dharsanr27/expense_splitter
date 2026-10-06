@@ -1,28 +1,21 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 import {
   createGroup,
   addMemberToGroup,
   memberList,
   userGroups,
-} from "../models/groupModels";
+} from "../models/groupModels.js";
 //1.Group creation
 export async function handleCreateGroup(
   req: Request,
   res: Response,
-): Promise<void> {
+next:NextFunction): Promise<void> {
   try {
     const { groupName } = req.body;
-    const createdBy = req.user.userId;
-    if (!groupName || !createdBy) {
-      // console.log("DEBUG: groupName is:", groupName);
-      // console.log("DEBUG: createdBy (req.user.userId) is:", createdBy);
-       res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-      return;
-    }
+    // console.log(req.user);
+    const createdBy = req.user!.userId;
+
     const newGroup = await createGroup(groupName, createdBy);
     //diff btw 201 and 200
      res.status(201).json({
@@ -32,29 +25,19 @@ export async function handleCreateGroup(
     });
   } catch (error) {
     console.error("Error in group creation controller:", error);
-     res.status(500).json({
-      success: false,
-      message: "something went wrong on the server",
-    });
+  
+    next(error);
   }
 }
 //2.Add members
 export async function handleAddMember(
   req: Request,
   res: Response,
-): Promise<void> {
+next:NextFunction): Promise<void> {
   try {
     const { groupId } = req.params;
     const { userId } = req.body;
-    //data validation
-    if (!groupId || !userId) {
-      //data validation status code 400
-       res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-      return;
-    }
+   
     const newMember = await addMemberToGroup(
       parseInt(groupId as string),
       userId,
@@ -69,27 +52,18 @@ export async function handleAddMember(
     ``;
   } catch (error) {
     console.error("Error in add member to the group controller:", error);
-     res.status(500).json({
-      success: false,
-      message: "Something went wrong in server",
-    });
+   
+    next(error);
   }
 }
 export async function handleMemberList(
   req: Request,
   res: Response,
-): Promise<void> {
-  console.time("fetch mem");
+next:NextFunction): Promise<void> {
+  // console.time("fetch mem");
   try {
     const { groupId } = req.params;
-    if (!groupId) {
-      //data validation status code 400
-       res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-      return;
-    }
+   
     const newMemberList = await memberList(parseInt(groupId as string)); //task:when ever we are getting from req.param why we do this is it professional
     // console.log(newMemberList);
     // console.log("hai!");
@@ -101,33 +75,24 @@ export async function handleMemberList(
     });
   } catch (error) {
     console.error("Error in the handle memberlist:", error);
-     res.status(500).json({
-      success: false,
-      message: "Something went wrong in server",
-    });
+    
+     next(error);
   }
-  console.timeEnd("fetch mem");
+  // console.timeEnd("fetch mem");
 }
 export async function handleUserGroups(
   req: Request,
   res: Response,
-): Promise<void> {
+next:NextFunction): Promise<void> {
   try {
-    const userId = req.user.userId;
+    const userId = req.user!.userId;
     // console.log(
     //   "DEBUG: Raw userId from token:",
     //   userId,
     //   "Type:",
     //   typeof userId,
     // );
-    if (!userId) {
-      //data validation status code 400
-       res.status(400).json({
-        success: false,
-        message: "You should login first",
-      });
-      return;
-    }
+  
     const newUserGroup = await userGroups(userId);
      res.status(200).json({
       success: true,
@@ -137,9 +102,7 @@ export async function handleUserGroups(
     });
   } catch (error) {
     console.error("Error in the handle userGroup controller:", error);
-     res.status(500).json({
-      success: false,
-      message: "Something went wrong in server",
-    });
+    
+     next(error);
   }
 }

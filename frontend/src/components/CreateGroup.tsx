@@ -19,7 +19,7 @@ const CreateGroup = () => {
     try {
       // Clean, abstract, and automatically handles base URL + headers
       const response = await API.post('/groups/createGroup', { groupName: groupName });
-      console.log('Group created:', response.data);
+      // console.log('Group created:', response.data);
       
       setMessage({ type: 'success', text: 'Group created successfully!' });
       setGroupName(''); // Reset input on success

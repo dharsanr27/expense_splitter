@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1789109697955" clover="3.2.0">
+  <project timestamp="1789109697956" name="All files">
+    <metrics statements="21" coveredstatements="21" conditionals="6" coveredconditionals="6" methods="7" coveredmethods="7" elements="34" coveredelements="34" complexity="0" loc="21" ncloc="21" packages="1" files="1" classes="1"/>
+    <file name="deptCalculator.ts" path="C:\Users\Dharsan\Desktop\expense_splitter\backend\src\utils\deptCalculator.ts">
+      <metrics statements="21" coveredstatements="21" conditionals="6" coveredconditionals="6" methods="7" coveredmethods="7"/>
+      <line num="20" count="13" type="stmt"/>
+      <line num="21" count="29" type="stmt"/>
+      <line num="22" count="12" type="stmt"/>
+      <line num="24" count="13" type="stmt"/>
+      <line num="25" count="29" type="stmt"/>
+      <line num="26" count="14" type="stmt"/>
+      <line num="30" count="13" type="stmt"/>
+      <line num="31" count="13" type="stmt"/>
+      <line num="33" count="13" type="stmt"/>
+      <line num="34" count="13" type="stmt"/>
+      <line num="35" count="13" type="stmt"/>
+      <line num="38" count="13" type="cond" truecount="2" falsecount="0"/>
+      <line num="39" count="12" type="stmt"/>
+      <line num="40" count="12" type="stmt"/>
+      <line num="43" count="12" type="stmt"/>
+      <line num="46" count="12" type="stmt"/>
+      <line num="55" count="12" type="stmt"/>
+      <line num="56" count="12" type="stmt"/>
+      <line num="59" count="12" type="cond" truecount="2" falsecount="0"/>
+      <line num="60" count="12" type="cond" truecount="2" falsecount="0"/>
+      <line num="63" count="13" type="stmt"/>
+    </file>
+  </project>
+</coverage>

@@ -1,4 +1,4 @@
-import { BaseResponse } from "./common.types";
+import { BaseResponse } from "./common.types.js";
 
 export interface ExpenseCreation{
   expenseId: number;

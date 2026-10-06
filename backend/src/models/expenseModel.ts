@@ -1,7 +1,7 @@
-import pool from "../config/database";
-import { db } from "../db";
+import pool from "../config/database.js";
+import { db } from "../db/index.js";
 import { eq,sql,desc } from "drizzle-orm";
-import { profiles, expenses, groupMembers, splits } from "../db/schema";
+import { profiles, expenses, groupMembers, splits } from "../db/schema.js";
 //Task 2: don't forget to add a function to avoid duplicates in expense table
 //1.create Expense with splits
 export async function createExpenseWithSplits(
@@ -77,90 +77,91 @@ type BalanceRow = {
   settlements_sent: string;
   settlements_received: string;
 };
-export async function getUserGroupBalance(groupId: number): Promise<
-  {
-    GroupId: number;
-    GroupName: string;
-    UserId: string;
-    UserName: string;
-    TotalAmountPaid: number;
-    TotalAmountOwed: number;
-    NetBalanceAmount: number;
-  }[]
-> {
-  //Task 3: try to modify this two querry into one querry
+export async function getUserGroupBalance(
+  groupId: number
+): Promise<BalanceRow[]> {
   try {
-    //TO find the total amount paid by the user in a specific group
     const balanceResult = await db.execute<BalanceRow>(sql`
-       WITH GroupPaid AS (
-          SELECT paid_by AS user_id, SUM(amount) AS total_paid
-          FROM expenses 
-          WHERE group_id = ${groupId}
-          GROUP BY paid_by
+      WITH GroupPaid AS (
+        SELECT
+          paid_by AS user_id,
+          SUM(amount) AS total_paid
+        FROM expenses
+        WHERE group_id = ${groupId}
+        GROUP BY paid_by
       ),
+
       GroupOwed AS (
-          SELECT s.user_id, SUM(s.amount_owed) AS total_owed
-          FROM splits s 
-          JOIN expenses e ON s.expense_id = e.id
-          WHERE e.group_id = ${groupId}
-          GROUP BY s.user_id
+        SELECT
+          s.user_id,
+          SUM(s.amount_owed) AS total_owed
+        FROM splits s
+        JOIN expenses e
+          ON s.expense_id = e.id
+        WHERE e.group_id = ${groupId}
+        GROUP BY s.user_id
       ),
+
       GroupSettlementsSent AS (
-          SELECT from_user_id AS user_id, SUM(amount) AS settlements_sent
-          FROM settlements 
-          WHERE group_id = ${groupId}
-          GROUP BY from_user_id
+        SELECT
+          from_user_id AS user_id,
+          SUM(amount) AS settlements_sent
+        FROM settlements
+        WHERE group_id = ${groupId}
+        GROUP BY from_user_id
       ),
+
       GroupSettlementsReceived AS (
-          SELECT to_user_id AS user_id, SUM(amount) AS settlements_received
-          FROM settlements 
-          WHERE group_id = ${groupId}
-          GROUP BY to_user_id
+        SELECT
+          to_user_id AS user_id,
+          SUM(amount) AS settlements_received
+        FROM settlements
+        WHERE group_id = ${groupId}
+        GROUP BY to_user_id
       )
-      
-      SELECT 
-          u.id AS user_id,
-          u.username,
-          g.name AS group_name,
-          COALESCE(p.total_paid, 0) AS total_paid,
-          COALESCE(o.total_owed, 0) AS total_owed,
-          COALESCE(ss.settlements_sent, 0) AS settlements_sent,
-          COALESCE(sr.settlements_received, 0) AS settlements_received
+
+      SELECT
+        u.id AS user_id,
+        u.username,
+        g.name AS group_name,
+
+        COALESCE(p.total_paid, 0) AS total_paid,
+        COALESCE(o.total_owed, 0) AS total_owed,
+
+        COALESCE(ss.settlements_sent, 0) AS settlements_sent,
+        COALESCE(sr.settlements_received, 0) AS settlements_received
+
       FROM group_members gm
-      JOIN profiles u ON gm.user_id = u.id
-      JOIN groups g ON gm.group_id = g.id
-      LEFT JOIN GroupPaid p ON u.id = p.user_id
-      LEFT JOIN GroupOwed o ON u.id = o.user_id
-      LEFT JOIN GroupSettlementsSent ss ON u.id = ss.user_id
-      LEFT JOIN GroupSettlementsReceived sr ON u.id = sr.user_id
-      WHERE gm.group_id = ${groupId};`);
-   
-    const allBalances = balanceResult.rows.map((row) => {
-      const totalPaid = parseFloat(row.total_paid);
-      const totalOwed = parseFloat(row.total_owed);
-      const settlementsSent = parseFloat(row.settlements_sent);
-      const settlementsReceived = parseFloat(row.settlements_received);
 
-      const groupName = row.group_name || "Unknown Group";
-      const username = row.username || "Unknown User";
+      JOIN profiles u
+        ON gm.user_id = u.id
 
-      // The Core Accounting Math
-      const netBalance =
-        totalPaid + settlementsSent - (totalOwed + settlementsReceived);
-      const formattedBalance = Number(netBalance.toFixed(2));
-      return {
-        GroupId: groupId,
-        GroupName: groupName,
-        UserId: row.user_id,
-        UserName: username,
-        TotalAmountPaid: totalPaid,
-        TotalAmountOwed: totalOwed,
-        NetBalanceAmount: formattedBalance,
-      };
-    });
-    return allBalances;
+      JOIN groups g
+        ON gm.group_id = g.id
+
+      LEFT JOIN GroupPaid p
+        ON u.id = p.user_id
+
+      LEFT JOIN GroupOwed o
+        ON u.id = o.user_id
+
+      LEFT JOIN GroupSettlementsSent ss
+        ON u.id = ss.user_id
+
+      LEFT JOIN GroupSettlementsReceived sr
+        ON u.id = sr.user_id
+
+      WHERE gm.group_id = ${groupId};
+    `);
+
+    return balanceResult.rows;
+
   } catch (error) {
-    console.error("Error in getUserGroupBalance model:", error);
+    console.error(
+      "Error in getUserGroupBalanceData model:",
+      error
+    );
+
     throw error;
   }
 }

@@ -1,7 +1,7 @@
-import {db} from "../db";
-import { profiles } from "../db/schema";
+import {db} from "../db/index.js";
+import { profiles } from "../db/schema.js";
 import { ilike } from "drizzle-orm";
-import { Profiles } from "../types";
+import { Profiles } from "../types/index.js";
 export async function getUserByName(userName:string):Promise<Profiles[]> {
   try {
    

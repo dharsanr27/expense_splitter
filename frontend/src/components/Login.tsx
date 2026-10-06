@@ -73,8 +73,9 @@ function Login() {
     {
       setErr(error.message);
     }
+
     const userId = session?.user.id;
-    console.log(userId);
+    // console.log(userId);
       if(error) console.error(error.message);
     };
   return (
@@ -109,6 +110,11 @@ function Login() {
           value={password}
           onChange={handlePassword}
         />
+         <div className="flex justify-end">
+    <Link to="/forgot-password" className="text-sm underline text-muted-foreground hover:text-foreground">
+      Forgot password?
+    </Link>
+  </div>
 
         <Button type="submit" className=" bg-[#0F6B5C] hover:bg-[#0c5449] w-full cursor-pointer">
           Login

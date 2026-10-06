@@ -42,7 +42,7 @@ function Login() {
             console.error(error.message);
             return;
           }
-          console.log(data); 
+          // console.log(data); 
           navigate('/');
         }
         catch(error)

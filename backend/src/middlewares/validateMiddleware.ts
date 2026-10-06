@@ -1,29 +1,28 @@
-import  {z} from 'zod';
-import { AnyZodObject } from 'zod/v3';
+import { z } from "zod";
+// import { AnyZodObject } from 'zod/v3';
 import { Request, Response, NextFunction } from "express";
 //what if i use arrow function when should i use arrow function
-const  validate=(schema:AnyZodObject) =>
-{
-    return async (req:Request,res:Response,next:NextFunction) =>
-    {
- try{
-    //pass the req.body to the schema
-    const result = await schema.parseAsync({
-        body:req.body,
-    params:req.params,
-query:req.query});
-    req.body =result.body;
-    req.params = result.params as any;
-    console.log("✅ Zod Validation Passed successfully!");
-    next();
+const validate = (schema: z.ZodObject<any>) => {
 
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      
+      //pass the req.body to the schema
+      const result = await schema.parseAsync({
+        body: req.body,
+        params: req.params,
+        query: req.query,
+        user:req.user,
+      });
+      req.body = result.body;
+      req.params = result.params as any;
+ 
+      // console.log("✅ Zod Validation Passed successfully!");
+      next();
+    } catch (error) {
+      next(error);
     }
-    catch(error)
-    {
-        next(error);
-    }
-    };
-   
+  };
 };
 export default validate;
 //i really don't have idea how this function works

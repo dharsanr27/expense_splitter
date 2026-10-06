@@ -1,8 +1,8 @@
 //does we need to add pool to every models
 // import { promises } from "node:dns";
 import { InferSelectModel,eq } from "drizzle-orm";
-import {db} from "../db";
-import {profiles,groups,groupMembers} from "../db/schema";
+import {db} from "../db/index.js";
+import {profiles,groups,groupMembers} from "../db/schema.js";
 
 
 //1.Create group
@@ -74,7 +74,7 @@ export async function memberList(groupId:number):Promise<Member[]>
         .from(profiles)
         .innerJoin(groupMembers,eq(profiles.id,groupMembers.userId))
         .where(eq(groupMembers.groupId,groupId));
-         console.timeEnd("DB");
+        //  console.timeEnd("DB");
         return result;
     }
     catch(error)
