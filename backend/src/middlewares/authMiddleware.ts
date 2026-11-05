@@ -3,9 +3,9 @@ import { supabase } from "../lib/supabase.js";
     
 export async function auth(req:Request,res:Response,next:NextFunction){
     
-// console.time("auth");
-    const authHeader = req.headers.authorization;//what it contain
-    const token = authHeader?.split(' ')[1];//why ?
+
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
     if(!token){
         return res.status(401).json({error:'No token provided'});
     }
@@ -14,14 +14,10 @@ export async function auth(req:Request,res:Response,next:NextFunction){
     if(error || !data.user){
         return res.status(401).json({error:'Invalid or expired token'});
     }
-//     const {
-//   data: { session },
-// } = await supabase.auth.getSession();
 
-// console.log(session?.access_token);
     
     req.user = {userId:data.user.id};
-    // console.log("AUTH:", req.user);
+   
     next();
-//  console.timeEnd("auth");   
+  
 }

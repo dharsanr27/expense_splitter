@@ -1,12 +1,4 @@
-/*
-  Group Members — "Ledger" design system
-  ---------------------------------------
-  A shared-expense page should feel like a passbook: warm paper, ink-stamped
-  status marks, tabular numerals for money, and a torn-receipt perforation
-  between sections. Light and dark themes are driven entirely by CSS
-  variables scoped to [data-theme], so the toggle never touches React state
-  beyond which value it writes.
-*/
+
 
 @import url("https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap");
 
@@ -19,9 +11,6 @@
 }
 
 
-/* .gm-app * {
-  box-sizing: border-box;
-} */
 
 .gm-shell {
   max-width: 560px;

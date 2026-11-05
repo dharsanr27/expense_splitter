@@ -1,5 +1,5 @@
 import { z } from "zod";
-//expense
+
 export const expenseSchema = z.object({
   params: z.object({
     groupId: z.coerce.number().int().positive(),
@@ -7,7 +7,7 @@ export const expenseSchema = z.object({
 });
 export const expenseSplitSchema = z.object({
   body: z.object({
-    //is z mentioning what
+   
     groupId: z.number().int().positive(),
     paidBy: z.string(),
     totalAmount: z.number().positive(),
@@ -20,4 +20,4 @@ export const UserBalanceSchema = z.object({
   }),
 });
 
-//what is the diff btw module.eports and esc modules
+

@@ -2,9 +2,9 @@
 import { supabase } from "@/lib/supabase";
 import axios from "axios";
 
-//base URL
+
 const API = axios.create({
-  // baseURL: "https://expense-splitter-api-nxou.onrender.com/api",
+  
   baseURL:import.meta.env.VITE_API_BASE_URL,
 });
 //attached the request interceptor

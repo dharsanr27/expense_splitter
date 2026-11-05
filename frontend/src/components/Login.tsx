@@ -61,20 +61,21 @@ function Login() {
  }
 };
  const handleGoogleLogin = async () =>{
-      
+      console.log("Current origin:", window.location.origin);
+console.log("Redirect target:", `${window.location.origin}/dashboard`);
       const {error}= await supabase.auth.signInWithOAuth({
         provider:'google',
         options:{
           redirectTo:`${window.location.origin}/dashboard`
         }
       });
-      const {data: {session}} = await supabase.auth.getSession();
+      const {data: {session}} = await supabase.auth.getSession();//needed
     if(error)
     {
       setErr(error.message);
     }
 
-    const userId = session?.user.id;
+    const userId = session?.user.id;//needed
     // console.log(userId);
       if(error) console.error(error.message);
     };
@@ -138,23 +139,3 @@ function Login() {
 export default Login;
 
 
-//  <div className="Login-app" data-theme={theme} >
-//       <Card className="w-[350px]">
-//         <CardHeader>
-//           <CardTitle className="Login-logo">Login</CardTitle>
-//         </CardHeader>
-
-//         <CardContent>
-//           <form onSubmit={handleSubmit}className="space-y-4">
-//             <Input type="email" placeholder="Email" onChange={handleEmail}  value={email}/>
-//             <Input type="password" placeholder="Password" onChange={handlePassword} value={password} />
-//             <Button type="submit" className="w-full">Login</Button>
-//             <p className="text-center">
-//                 Don't have an account?<a href="/signup" className="hover:underline">Sign Up</a>
-//             </p>
-//           </form>
-       
-         
-//         </CardContent>
-//       </Card>
-//     </div>

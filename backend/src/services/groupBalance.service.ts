@@ -1,5 +1,5 @@
 import { getUserGroupBalance } from "../models/expenseModel.js";
-import { calculateNetBalance } from "../utils/groupBalance.js";
+import { calculateNetBalance } from "../utils/NetBalance.js";
 
 export async function getUserGroupBalanceData(groupId: number) {
   const rows = await getUserGroupBalance(groupId);

@@ -4,6 +4,9 @@ import { eq,sql,desc } from "drizzle-orm";
 import { profiles, expenses, groupMembers, splits } from "../db/schema.js";
 //Task 2: don't forget to add a function to avoid duplicates in expense table
 //1.create Expense with splits
+//why we are using the pool.connect
+  //what is transaction concept
+
 export async function createExpenseWithSplits(
   groupId: number,
   paidBy: string,
@@ -17,56 +20,82 @@ export async function createExpenseWithSplits(
   splitAmount: number;
   totalMembers: number;
 }> {
-  // console.log({ groupId, paidBy, totalAmount, description })
-  //why we are using the pool.connect
-  //what is transaction concept
-  // const client = await pool.connect();
   try {
-    const result = await db.transaction(async (tx) => {
-      const [expense] = await tx
-        .insert(expenses)
-        .values({
-          groupId,
-          paidBy,
-          amount: totalAmount.toString(),
-          description,
-        })
-        .returning({
-          id: expenses.id,
-        });
-      const expenseId = expense.id;
+  
 
+    // Convert rupees to integer paise.
+    const totalPaise = Math.round(totalAmount * 100);
+
+    if (totalPaise <= 0) {
+      throw new Error("Expense amount must be at least ₹0.01");
+    }
+
+    const result = await db.transaction(async (tx) => {
+      // Fetch group members.
       const members = await tx
         .select({
           userId: groupMembers.userId,
         })
         .from(groupMembers)
         .where(eq(groupMembers.groupId, groupId));
+
       const totalMembers = members.length;
 
-      const splitAmount = totalAmount / totalMembers;
-
-      for (const member of members) {
-        await tx.insert(splits).values({
-          expenseId,
-          userId: member.userId,
-          amountOwed: splitAmount.toString(),
-        });
+      if (totalMembers === 0) {
+        throw new Error(
+          "Cannot create an expense for a group with no members",
+        );
       }
+
+      // Divide the expense into whole paise.
+      const baseSharePaise = Math.floor(totalPaise / totalMembers);
+      const remainderPaise = totalPaise % totalMembers;
+
+      // Insert the expense.
+      const [expense] = await tx
+        .insert(expenses)
+        .values({
+          groupId,
+          paidBy,
+          amount: (totalPaise / 100).toFixed(2),
+          description,
+        })
+        .returning({
+          id: expenses.id,
+        });
+
+      // Prepare all member splits.
+      const splitRecords = members.map((member, index) => {
+        const memberSharePaise =
+          baseSharePaise + (index < remainderPaise ? 1 : 0);
+
+        return {
+          expenseId: expense.id,
+          userId: member.userId,
+          amountOwed: (memberSharePaise / 100).toFixed(2),
+        };
+      });
+
+      // Insert all splits in one database operation.
+      await tx.insert(splits).values(splitRecords);
+
       return {
-        expenseId,
+        expenseId: expense.id,
         groupId,
         paidBy,
-        totalAmount,
-        splitAmount,
+        totalAmount: totalPaise / 100,
+        splitAmount: baseSharePaise / 100,
         totalMembers,
       };
     });
+
     return result;
   } catch (error) {
+    console.error("Failed to create expense with splits:", error);
     throw error;
   }
 }
+
 //2.Check user balance
 type BalanceRow = {
   user_id: string;
@@ -79,7 +108,7 @@ type BalanceRow = {
 };
 export async function getUserGroupBalance(
   groupId: number
-): Promise<BalanceRow[]> {
+): Promise<BalanceRow[]> { 
   try {
     const balanceResult = await db.execute<BalanceRow>(sql`
       WITH GroupPaid AS (

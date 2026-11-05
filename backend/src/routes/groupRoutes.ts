@@ -12,9 +12,7 @@ import validate from "../middlewares/validateMiddleware.js";
 
 import { groupCreateSchema,addMemberSchema,userGroupSchema,membersSchema } from "../validates/groupValidates.js";
 
-//why we are calling express.Router() instead express.Router
 const router:Router = express.Router();
-//I need to name the endpoints on user perspective or developer perspective
 router.post("/createGroup", auth,validate(groupCreateSchema),handleCreateGroup);
 router.post("/addMember/:groupId", auth,validate(addMemberSchema),handleAddMember);
 router.get("/groupMembers/:groupId",auth,verifyGroupMember,validate(membersSchema),handleMemberList);

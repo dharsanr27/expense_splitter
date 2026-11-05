@@ -12,6 +12,8 @@ import { ThemeProvider } from "./components/ThemeContext";
 import { AuthProvider } from "./components/AuthContext";
 import Navbar from "./components/Navbar";
 
+
+
 const NO_NAVBAR_ROUTES = ["/forgot-password", "/reset-password"];
 
 function AppContent() {
@@ -44,7 +46,10 @@ function App() {
         <AppContent />
       </BrowserRouter>
     </ThemeProvider>
+
+
     </AuthProvider>
+   
   );
 }
 

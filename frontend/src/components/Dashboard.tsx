@@ -4,9 +4,7 @@ import GroupDetailPage from "./GroupDetailPage";
 function Dashboard(){
 return (
     <div>
-        <GroupDetailPage/> 
-           
-         
+        <GroupDetailPage/>      
     </div>
    
 )

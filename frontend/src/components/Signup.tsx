@@ -14,25 +14,19 @@ import type { ChangeEvent,SubmitEvent } from "react";
 function Login() {
   const navigate = useNavigate();
   const[email,setEmail]=useState("");
-  // const[username,setUserName]=useState("");
+  
  
   const[password,setPassword]=useState("");
   const {theme} = useTheme();
   const handleEmail=(event: ChangeEvent<HTMLInputElement>)=>{setEmail(event.target.value)};
-  // const handleUserName=event=>{setUserName(event.target.value)};
+ 
   const handlePassword=(event: ChangeEvent<HTMLInputElement>)=>{setPassword(event.target.value)};
     const handleSubmit = async (e:SubmitEvent<HTMLFormElement>)=>{
        e.preventDefault();
       const formData = new FormData(e.target);
         const username=formData.get("username");
         try{
-          //  const response = await API.post("/users/register",
-          //   {
-          //    username,
-          //   email,
-          //   password
-          //   });
-          //change 1
+         
           const {data,error} = await supabase.auth.signUp({
             email,
             password,
@@ -42,7 +36,7 @@ function Login() {
             console.error(error.message);
             return;
           }
-          // console.log(data); 
+         
           navigate('/');
         }
         catch(error)

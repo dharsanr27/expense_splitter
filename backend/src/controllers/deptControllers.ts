@@ -8,20 +8,31 @@ export const getGroupDashboardData = async (req: Request, res: Response):Promise
     const cacheKey = `group:${groupId}:dashboard`;
 
     const cachedDashboard = await redisClient.get(cacheKey);
+   
+
+if (cachedDashboard) {
+ 
+  res.status(200).json({
+    success: true,
+    data: JSON.parse(cachedDashboard),
+  });
+  return;
+}
+
     // 1. Fetch raw balances from PostgreSQL (The query we wrote earlier)
     const rawBalances = await getUserGroupBalanceData(groupId);
-// console.log(rawBalances)
+
     // 2. Pass the raw balances into the memory algorithm
     const simplifiedTransactions = calculateSimplifiedDebts(rawBalances);
 
-// console.log(simplifiedTransactions);
+
      const dashboardData = {
       balances: rawBalances,// Used for the user list mapping
       settlements: simplifiedTransactions// Used for the "Pay Now" actions
     };
 
     await redisClient.set(cacheKey,JSON.stringify(dashboardData),{EX:300});
-    // 3. Send everything to React
+    
      res.status(200).json({
       success: true,
       data: dashboardData

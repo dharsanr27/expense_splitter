@@ -5,7 +5,7 @@ interface CustomError extends Error{
 }
 const error = (err:CustomError|ZodError|any,req:Request,res:Response,next:NextFunction):Response |void =>{
     console.error("Central Error Handler caught:",err);
-    //what the instanceof keyword do
+   
     if(err instanceof ZodError)
     {
         return res.status(400).json(

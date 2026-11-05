@@ -1,26 +1,15 @@
-
-import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
 import { getUserByName } from "../models/userModels.js";
-import { Profiles } from "../types/index.js";
 
-interface BaseResponse<T> {
-  success: boolean;
-  message: string;
-  data?: T;
-}
-
-//3.get user by name
-interface GetUserQuery {
-  search?: string;
-}
 
 export async function handleGetUser(
-  req: Request<{}, BaseResponse<Profiles[]>, {}, GetUserQuery>,
-  res: Response<BaseResponse<Profiles[]>>,
+  req: Request,
+  // res: Response<BaseResponse<Profiles[]>>,
+   res: Response,
   next: NextFunction,
 ): Promise<void> {
   try {
+    const { groupId } = req.params;
     const { search } = req.query;
     if (typeof search !== "string") {
      res.status(400).json({
@@ -30,7 +19,7 @@ export async function handleGetUser(
     return;
 }
 
-    const newGetUser = await getUserByName(search);
+    const newGetUser = await getUserByName(parseInt(groupId as string),search);
     res.status(201).json({
       success: true,
       message: "Succesfully retrieved username:",

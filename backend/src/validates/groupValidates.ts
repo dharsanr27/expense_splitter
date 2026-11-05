@@ -31,4 +31,3 @@ export  const userGroupSchema = z.object({
 })
 
 
-//q2:zod change the object or just check

@@ -1,8 +1,8 @@
 import {db} from "../db/index.js";
-import { profiles } from "../db/schema.js";
-import { ilike } from "drizzle-orm";
+import { groupMembers, profiles } from "../db/schema.js";
+import { and, ilike, notExists, eq } from "drizzle-orm";
 import { Profiles } from "../types/index.js";
-export async function getUserByName(userName:string):Promise<Profiles[]> {
+export async function getUserByName(groupId:number,userName:string):Promise<Profiles[]> {
   try {
    
     const result = await db
@@ -11,7 +11,23 @@ export async function getUserByName(userName:string):Promise<Profiles[]> {
       username:profiles.username,
     })
     .from(profiles)
-    .where(ilike(profiles.username,`%${userName}%`))
+    .where(
+      and(
+        ilike(profiles.username,`%${userName}%`),
+      notExists(
+        db
+        .select()
+        .from(groupMembers)
+        .where(
+          and(
+            eq(groupMembers.userId,profiles.id),
+            eq(groupMembers.groupId,groupId),
+          ),
+        ),
+        
+      ),
+    ),
+  )
     .limit(10);
     return result;
   } catch (error) {

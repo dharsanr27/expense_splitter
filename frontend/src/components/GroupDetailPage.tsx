@@ -31,9 +31,7 @@ type UserGroup = {
     fetchGroups();
   }, []);
 
-  // Tailwind's `dark:` variants only fire inside an ancestor with the
-  // `dark` class, so we toggle it here based on the same theme value
-  // the rest of the app already uses.
+
   const isDark = theme === "dark";
 
   // --- LOADING SKELETON STATE ---

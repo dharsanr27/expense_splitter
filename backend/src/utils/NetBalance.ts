@@ -4,6 +4,7 @@ export function calculateNetBalance(
   settlementsSent: number,
   settlementsReceived: number
 ): number {
+
   const netBalance =
     totalPaid +
     settlementsSent -

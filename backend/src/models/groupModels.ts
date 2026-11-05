@@ -106,4 +106,3 @@ export async function userGroups(userId:string):Promise<UserGroup[]>
     }
   
 }
-  //Task1:remove all the promise<any>

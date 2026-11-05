@@ -1,11 +1,11 @@
-// Define the input (what your DB query returns)
+
 export interface UserBalance {
   UserId: string;
   UserName: string;
   NetBalanceAmount: number;
 }
 
-// Define the output (what React needs to show the UI)
+
 export interface SimplifiedDebt {
   fromUserId: string;
   fromUserName: string;

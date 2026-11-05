@@ -13,11 +13,11 @@ export async function handleCreateGroup(
 next:NextFunction): Promise<void> {
   try {
     const { groupName } = req.body;
-    // console.log(req.user);
+    
     const createdBy = req.user!.userId;
 
     const newGroup = await createGroup(groupName, createdBy);
-    //diff btw 201 and 200
+    
      res.status(201).json({
       success: true,
       message: "Group created succesfully",
@@ -41,11 +41,10 @@ next:NextFunction): Promise<void> {
     const newMember = await addMemberToGroup(
       parseInt(groupId as string),
       userId,
-    ); //why we are doing the parseint for everytime we use params
-    //status code:201 for successful post data the database
+    );
      res.status(201).json({
       success: true,
-      //modify this so that it should show group name in which the user joined task 1: pending
+      
       message: "Succesfully added  to the group",
       data: newMember,
     });
@@ -60,16 +59,14 @@ export async function handleMemberList(
   req: Request,
   res: Response,
 next:NextFunction): Promise<void> {
-  // console.time("fetch mem");
+  
   try {
     const { groupId } = req.params;
    
-    const newMemberList = await memberList(parseInt(groupId as string)); //task:when ever we are getting from req.param why we do this is it professional
-    // console.log(newMemberList);
-    // console.log("hai!");
+    const newMemberList = await memberList(parseInt(groupId as string)); 
+    
      res.status(201).json({
       success: true,
-      //modify this so that it should show group name in which the user joined task 1: pending
       message: "Succesfully retrieved group member:",
       data: newMemberList,
     });
@@ -78,7 +75,7 @@ next:NextFunction): Promise<void> {
     
      next(error);
   }
-  // console.timeEnd("fetch mem");
+  
 }
 export async function handleUserGroups(
   req: Request,
@@ -86,17 +83,12 @@ export async function handleUserGroups(
 next:NextFunction): Promise<void> {
   try {
     const userId = req.user!.userId;
-    // console.log(
-    //   "DEBUG: Raw userId from token:",
-    //   userId,
-    //   "Type:",
-    //   typeof userId,
-    // );
+ 
   
     const newUserGroup = await userGroups(userId);
      res.status(200).json({
       success: true,
-      //modify this so that it should show group name in which the user joined task 1: pending
+      
       message: "Succesfully retrieved groups:",
       data: newUserGroup,
     });
